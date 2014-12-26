@@ -2,5 +2,6 @@
 #define NUMERIC_UTILS_H_
 
 #define MIN(x,y) (((x) < (y)) ? (x) : (y))
+#define MAX(x,y) (((x) > (y)) ? (x) : (y))
 
 #endif
