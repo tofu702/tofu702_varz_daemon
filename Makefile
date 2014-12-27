@@ -1,7 +1,7 @@
 CC=gcc
 CFLAGS=-Wall -std=c99 -g
 SOURCES=counter_variable.c time_utils.c sample_variable.c
-TEST_SOURCES=$(SOURCES) counter_variable_test.c
+TEST_SOURCES=$(SOURCES) counter_variable_test.c sample_variable_test.c all_tests.c
 
 
 build: $(TEST_SOURCES)

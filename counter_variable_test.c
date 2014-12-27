@@ -1,9 +1,10 @@
 #include <stdlib.h>
 #include <stdio.h>
 
+#include "all_tests.h"
 #include "counter_variable.h"
 
-int test_counter_trivial_increments() {
+static int test_counter_trivial_increments() {
   VARZMHTIntCounter_t counter; 
   unsigned long base_sec_since_epoch = VARZMakeTime(10, 5, 0, 0);
   VARZMHTIntCounterInit(&counter, base_sec_since_epoch);
@@ -28,7 +29,7 @@ int test_counter_trivial_increments() {
 }
 
 
-int test_counter_with_older_values() {
+static int test_counter_with_older_values() {
   VARZMHTIntCounter_t counter; 
   unsigned long base_sec_since_epoch = VARZMakeTime(10, 5, 0, 30);
   VARZMHTIntCounterInit(&counter, base_sec_since_epoch);
@@ -51,7 +52,7 @@ int test_counter_with_older_values() {
 }
 
 
-int test_count_pruning() {
+static int test_count_pruning() {
   VARZMHTIntCounter_t counter; 
   unsigned long base_sec_since_epoch = VARZMakeTime(0, 60, 0, 0);
   VARZMHTIntCounterInit(&counter, base_sec_since_epoch);
@@ -89,7 +90,7 @@ int test_count_pruning() {
   return 0;
 }
 
-int test_counter_pruning_isnt_off_by_one_on_low_side() {
+static int test_counter_pruning_isnt_off_by_one_on_low_side() {
   VARZMHTIntCounter_t counter; 
   unsigned long base_sec_since_epoch = VARZMakeTime(0, 60, 0, 0);
   VARZMHTIntCounterInit(&counter, base_sec_since_epoch);
@@ -118,7 +119,7 @@ int test_counter_pruning_isnt_off_by_one_on_low_side() {
   return 0;
 }
 
-int test_counter_pruning_isnt_off_by_one_on_high_side() {
+static int test_counter_pruning_isnt_off_by_one_on_high_side() {
   VARZMHTIntCounter_t counter; 
   unsigned long base_sec_since_epoch = VARZMakeTime(0, 60, 0, 0);
   VARZMHTIntCounterInit(&counter, base_sec_since_epoch);
@@ -143,7 +144,7 @@ int test_counter_pruning_isnt_off_by_one_on_high_side() {
   return 0;
 }
 
-int test_counter_pruning_with_non_zero_start_minute() {
+static int test_counter_pruning_with_non_zero_start_minute() {
   VARZMHTIntCounter_t counter; 
   unsigned long base_sec_since_epoch = VARZMakeTime(0, 60, 10, 0);
   VARZMHTIntCounterInit(&counter, base_sec_since_epoch);
@@ -169,7 +170,7 @@ int test_counter_pruning_with_non_zero_start_minute() {
   return 0;
 }
 
-int main(int argc, char **argv) {
+int counter_variable_tests() {
   int failure_count = 0;
   failure_count += test_counter_trivial_increments();
   failure_count += test_counter_with_older_values();
