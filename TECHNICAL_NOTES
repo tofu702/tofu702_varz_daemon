@@ -1,0 +1,13 @@
+UDP Command Format
+COMMAND -> OPERATION VARIABLE TIME VALUE
+OPERATIONS: "MHTCOUNTERADD" | "MHTSAMPLEADD"
+VARIABLE: ALPHANUMERIC + "_" 
+TIME: ms_since_epoch
+VALUE: 
+  - For counters, amount to increment the counter by
+  - For samples, the value of the sample
+
+
+Examples:
+MHTCOUNTERADD lookup_request 1420960985123 2
+MHTSAMPLEADD lookup_request_latency_ms 1420960985123 231
