@@ -5,5 +5,6 @@ int counter_variable_tests();
 int sample_variable_tests();
 
 int hash_table_tests();
+int input_parser_tests();
 
 #endif
