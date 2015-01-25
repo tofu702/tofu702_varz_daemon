@@ -62,13 +62,13 @@ static int test_sample_parser_with_legal_input() {
     return 1;
   } else if(strcmp("s", desc.variable_name) != 0) {
     return 1;
-  } else if(desc.op_data.sample_add_op.time != 3) {
+  } else if(desc.op_data.sampler_add_op.time != 3) {
     return 1;
-  } else if(desc.op_data.sample_add_op.value != 4) {
+  } else if(desc.op_data.sampler_add_op.value != 4) {
     return 1;
-  } else if(desc.op_data.sample_add_op.random_vals[0] != stub_vals[0]) {
+  } else if(desc.op_data.sampler_add_op.random_vals[0] != stub_vals[0]) {
     return 1;
-  } else if(desc.op_data.sample_add_op.random_vals[1] != stub_vals[1]) {
+  } else if(desc.op_data.sampler_add_op.random_vals[1] != stub_vals[1]) {
     return 1;
   }
 

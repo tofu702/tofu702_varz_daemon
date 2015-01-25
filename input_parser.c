@@ -98,13 +98,13 @@ void MHTCounterParse(char *cmd_remainder, struct VARZOperationDescription *dest)
 
 
 void MHTSampleParse(char *cmd_remainder, struct VARZOperationDescription *dest) {
-  struct VARZMHTSampleAddOp *sample_op = &(dest->op_data.sample_add_op);
-  int rv = sscanf(cmd_remainder, "%lu %lu", &(sample_op->time), &(sample_op->value));
+  struct VARZMHTSamplerAddOp *sampler_op = &(dest->op_data.sampler_add_op);
+  int rv = sscanf(cmd_remainder, "%lu %lu", &(sampler_op->time), &(sampler_op->value));
   if (rv != 2) {
     dest->op = VARZOP_INVALID;
     return;
   }
 
-  sample_op->random_vals[0] = VARZRand64();
-  sample_op->random_vals[1] = VARZRand64();
+  sampler_op->random_vals[0] = VARZRand64();
+  sampler_op->random_vals[1] = VARZRand64();
 }

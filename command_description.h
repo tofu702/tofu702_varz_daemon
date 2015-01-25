@@ -19,7 +19,7 @@ struct VARZMHTCounterAddOp {
   unsigned int amt;
 };
 
-struct VARZMHTSampleAddOp {
+struct VARZMHTSamplerAddOp {
   varz_time_t time; 
   unsigned long value;
   uint64_t random_vals[2];
@@ -27,7 +27,7 @@ struct VARZMHTSampleAddOp {
 
 union VARZOperationData {
   struct VARZMHTCounterAddOp counter_add_op;
-  struct VARZMHTSampleAddOp sample_add_op;
+  struct VARZMHTSamplerAddOp sampler_add_op;
 };
 
 struct VARZOperationDescription {
