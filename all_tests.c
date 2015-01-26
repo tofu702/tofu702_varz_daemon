@@ -8,5 +8,6 @@ int main(int argc, char **argv) {
   failure_count += sample_variable_tests();
   failure_count += hash_table_tests();
   failure_count += input_parser_tests();
+  failure_count += executor_tests();
   return failure_count;
 }
