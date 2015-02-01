@@ -1,5 +1,6 @@
 #include <stdlib.h>
 #include <stdio.h>
+#include <string.h>
 
 #include "all_tests.h"
 #include "counter_variable.h"
@@ -170,6 +171,32 @@ static int test_counter_pruning_with_non_zero_start_minute() {
   return 0;
 }
 
+
+static int test_counter_json_repr() {
+  sds repr_sds;
+  VARZMHTIntCounter_t counter; 
+  unsigned long base_sec_since_epoch = VARZMakeTime(0, 60, 0, 0);
+  VARZMHTIntCounterInit(&counter, base_sec_since_epoch);
+
+  VARZMHTIntCounterIncrement(&counter, base_sec_since_epoch, 1);
+  VARZMHTIntCounterIncrement(&counter, base_sec_since_epoch + 1800, 2);
+  VARZMHTIntCounterIncrement(&counter, base_sec_since_epoch + 3600, 3);
+
+  repr_sds = sdsempty();
+
+  VARZMHTIntCounterJSONRepr(&counter, &repr_sds);
+
+  const char *desired_output = "{\"min_counters\":[3,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,"
+     "0,0,0,0,0,0,0,0,2,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],"
+     "\"all_time_count\":6,\"latest_time\":219600}";
+  if (strcmp(desired_output, repr_sds)) {
+    return 1;
+  }
+  sdsfree(repr_sds);
+  return 0;
+}
+
+
 int counter_variable_tests() {
   int failure_count = 0;
   failure_count += test_counter_trivial_increments();
@@ -178,6 +205,7 @@ int counter_variable_tests() {
   failure_count += test_counter_pruning_isnt_off_by_one_on_low_side();
   failure_count += test_counter_pruning_isnt_off_by_one_on_high_side();
   failure_count += test_counter_pruning_with_non_zero_start_minute();
+  failure_count += test_counter_json_repr();
 
   return failure_count;
 }

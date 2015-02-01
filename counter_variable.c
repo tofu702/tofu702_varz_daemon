@@ -2,7 +2,10 @@
 #include <stdio.h>
 #include <strings.h>
 
+#include "sds/sds.h"
+
 #include "counter_variable.h"
+#include "json_helpers.h"
 #include "numeric_utils.h"
 #include "time_utils.h"
 
@@ -47,6 +50,36 @@ void VARZMHTIntCounterIncrement(VARZMHTIntCounter_t *counter, varz_time_t sample
   }
   unsigned long min_idx = sample_min_since_epoch % MIN_IN_HOUR;
   counter->min_counters[min_idx] += amt;
+}
+
+
+void VARZMHTIntCounterJSONRepr(VARZMHTIntCounter_t *counter, sds *dest) {
+ /* int min_counters_repr_size = VARZJSONBytesNeededForList(MIN_IN_HOUR, JSON_BYTES_NEEDED_FOR_UL);
+  char min_counters_repr[min_counters_repr_size];
+  int all_time_count_repr_size = JSON_BYTES_NEEDED_FOR_UL;
+  int latest_time_repr_size = JSON_BYTES_NEEDED_FOR_TIME;
+  char latest_time_repr[latest_time_repr_size];
+  int fudge_size = 64;
+  int total_required_size = min_counters_repr_size + all_time_count_repr_size + latest_time_repr_size + fudge_size;
+  char *overall_repr = calloc(total_required_size, sizeof(char));
+  VARZJSONUnsignedLongArrToRepr(counter->min_counters, MIN_IN_HOUR, min_counters_repr,
+                                min_counters_repr_size);
+  VARZJSONTimeRepr(counter->latest_time, latest_time_repr, latest_time_repr_size);
+  sprintf("{min_counters: %s, all_time_count: %llu, latest_time: %s}", min_counters_repr, 
+          counter->all_time_count, latest_time_repr);*/
+  VARZJSONDictStart(dest);
+  VARZJSONDictKey(dest, "min_counters");
+  VARZJSONUnsignedLongArrToRepr(dest, counter->min_counters, MIN_IN_HOUR);
+
+  VARZJSONDictNextKey(dest);
+  VARZJSONDictKey(dest, "all_time_count");
+  VARZJSONUnsignedLongRepr(dest, counter->all_time_count);
+
+  VARZJSONDictNextKey(dest);
+  VARZJSONDictKey(dest, "latest_time");
+  VARZJSONTimeRepr(dest, counter->latest_time);
+
+  VARZJSONDictEnd(dest);
 }
 
 
