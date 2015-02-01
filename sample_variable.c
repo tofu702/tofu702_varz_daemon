@@ -51,7 +51,7 @@ void VARZMHTIntSamplerAddSample(VARZMHTIntSampler_t *sample, varz_time_t sample_
 void VARZIntSampleSetInit(VARZIntSampleSet_t *sample_set, unsigned long samples_size) {
   bzero(sample_set, sizeof(VARZIntSampleSet_t));
   sample_set->samples_size = samples_size;
-  sample_set->samples = calloc(samples_size, sizeof(unsigned long));
+  sample_set->samples = calloc(samples_size, sizeof(VARZIntSample_t));
 }
 
 
