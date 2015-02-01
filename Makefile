@@ -1,7 +1,8 @@
 CC=gcc
 CFLAGS=-Wall -std=c99 -g
-SOURCES=counter_variable.c time_utils.c sample_variable.c hash_table.c input_parser.c random.c hash_funcs.c executor.c
-TEST_SOURCES=$(SOURCES) counter_variable_test.c sample_variable_test.c executor_test.c hash_table_test.c input_parser_test.c all_tests.c
+THIRDPARTY_SOURCES=sds/sds.c
+SOURCES=$(THIRDPARTY_SOURCES) counter_variable.c time_utils.c sample_variable.c hash_table.c json_helpers.c input_parser.c random.c hash_funcs.c executor.c
+TEST_SOURCES=$(SOURCES) counter_variable_test.c sample_variable_test.c executor_test.c hash_table_test.c json_helpers_test.c input_parser_test.c all_tests.c
 TEST_FLAGS=-D VARZ_STUB
 DAEMON_SOURCES=$(SOURCES) daemon.c
 
