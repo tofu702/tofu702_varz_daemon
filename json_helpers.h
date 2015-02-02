@@ -15,6 +15,11 @@
 void VARZJSONUnsignedLongArrToRepr(sds *dest, unsigned long *arr, size_t num_elem);
 
 
+void VARZJSONArrayStart(sds *dest);
+void VARZJSONArrayNextItem(sds *dest);
+void VARZJSONArrayEnd(sds *dest);
+
+
 void VARZJSONDictStart(sds *dest);
 void VARZJSONDictNextKey(sds *dest);
 void VARZJSONDictEnd(sds *dest);

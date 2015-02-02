@@ -20,6 +20,17 @@ void VARZJSONUnsignedLongArrToRepr(sds *dest, unsigned long *arr, size_t num_ele
   sdscatprintf_ptr(dest, "]");
 }
 
+void VARZJSONArrayStart(sds *dest) {
+  *dest = sdscat(*dest, "[");
+}
+
+void VARZJSONArrayNextItem(sds *dest) {
+  *dest = sdscat(*dest, ",");
+}
+
+void VARZJSONArrayEnd(sds *dest) {
+  *dest = sdscat(*dest, "]");
+}
 
 void VARZJSONDictStart(sds *dest) {
   *dest = sdscat(*dest, "{");
