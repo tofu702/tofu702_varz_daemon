@@ -4,12 +4,14 @@
 #include <stdlib.h>
 #include <strings.h>
 
+#include "json_helpers.h"
 #include "numeric_utils.h"
 #include "sample_variable.h"
 
 /****STATIC HELPER PROTOTYPES*****/
 static bool shouldWeReplaceElement(unsigned long num_events_inc_this_one, unsigned long samples_size,
     uint32_t random_value);
+static void intSampleJSONRepr(VARZIntSample_t *sample, sds *dest);
 
 /***** VARZMHTIntSample Implementation *****/
 void VARZMHTIntSamplerInit(VARZMHTIntSampler_t *sampler, varz_time_t start_time,
@@ -44,6 +46,24 @@ void VARZMHTIntSamplerAddSample(VARZMHTIntSampler_t *sample, varz_time_t sample_
   } //Otherwise: We'll drop this sample since it doesn't correspond to the most recent minute
 
   sample->latest_time = MAX(sample->latest_time, sample_time);
+}
+
+
+void VARZMHTIntSamplerJSONRepr(VARZMHTIntSampler_t *sampler, sds *dest) {
+  VARZJSONDictStart(dest);
+
+  VARZJSONDictKey(dest, "latest_time");
+  VARZJSONTimeRepr(dest, sampler->latest_time);
+
+  VARZJSONDictNextKey(dest);
+  VARZJSONDictKey(dest, "last_minute_samples");
+  VARZIntSampleSetJSONRepr(&(sampler->min_samples), dest);
+
+  VARZJSONDictNextKey(dest);
+  VARZJSONDictKey(dest, "all_time_samples");
+  VARZIntSampleSetJSONRepr(&(sampler->all_time_samples), dest);
+
+  VARZJSONDictEnd(dest);
 }
 
 
@@ -96,6 +116,32 @@ void VARZIntSampleAddSample(VARZIntSampleSet_t *sample_set, varz_time_t sample_t
   sample_set->num_events ++;
 }
 
+
+void VARZIntSampleSetJSONRepr(VARZIntSampleSet_t *sample_set, sds *dest) {
+  VARZJSONDictStart(dest);
+
+  VARZJSONDictKey(dest, "samples");
+  VARZJSONArrayStart(dest);
+  // Only bother serializing the samples we have
+  for (int i=0; i < MIN(sample_set->samples_size, sample_set->num_events); i++) {
+    if (i != 0) {
+      VARZJSONArrayNextItem(dest);
+    }
+    intSampleJSONRepr(&(sample_set->samples[i]), dest);
+  }
+  VARZJSONArrayEnd(dest);
+  
+  VARZJSONDictNextKey(dest);
+  VARZJSONDictKey(dest, "samples_size");
+  VARZJSONUnsignedLongRepr(dest, sample_set->samples_size);
+
+  VARZJSONDictNextKey(dest);
+  VARZJSONDictKey(dest, "num_events");
+  VARZJSONUnsignedLongRepr(dest, sample_set->num_events);
+
+  VARZJSONDictEnd(dest);
+}
+
 /***** VARZIntSampleSet Static Helpers *****/
 static bool shouldWeReplaceElement(unsigned long num_events_inc_this_one, unsigned long samples_size,
     uint32_t random_value) {
@@ -116,4 +162,17 @@ static bool shouldWeReplaceElement(unsigned long num_events_inc_this_one, unsign
 //  printf("DEBUG: rv=%u (%f%%)\n", random_value, (float)random_value / UINT32_MAX);
 
   return random_value > acceptance_bound;
+}
+
+
+static void intSampleJSONRepr(VARZIntSample_t *sample, sds *dest) {
+  VARZJSONDictStart(dest);
+  VARZJSONDictKey(dest, "sample_value");
+  VARZJSONUnsignedLongRepr(dest, sample->sample_value);
+
+  VARZJSONDictNextKey(dest);
+  VARZJSONDictKey(dest, "sample_time");
+  VARZJSONTimeRepr(dest, sample->sample_time);
+
+  VARZJSONDictEnd(dest);
 }

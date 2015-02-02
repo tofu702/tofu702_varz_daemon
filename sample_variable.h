@@ -3,6 +3,8 @@
 
 #include <stdint.h>
 
+#include "sds/sds.h"
+
 #include "time_utils.h"
 
 typedef struct {
@@ -36,6 +38,7 @@ void VARZMHTIntSamplerInit(VARZMHTIntSampler_t *sampler, varz_time_t start_time,
 void VARZMHTIntSamplerFree(VARZMHTIntSampler_t *sampler);
 void VARZMHTIntSamplerAddSample(VARZMHTIntSampler_t *sample, varz_time_t sample_time,
     unsigned long sample_value, uint64_t random_vals[2]);
+void VARZMHTIntSamplerJSONRepr(VARZMHTIntSampler_t *sampler, sds *dest);
 
 
 
@@ -61,7 +64,7 @@ void VARZIntSampleSetClear(VARZIntSampleSet_t *sample_set);
 void VARZIntSampleSetFree(VARZIntSampleSet_t *sample_set);
 void VARZIntSampleAddSample(VARZIntSampleSet_t *sample_set, varz_time_t sample_time,
     unsigned long sample_value, uint64_t random_value);
-
+void VARZIntSampleSetJSONRepr(VARZIntSampleSet_t *sample_set, sds *dest);
 
 #endif
 

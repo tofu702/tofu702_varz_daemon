@@ -2,6 +2,7 @@
 #include <stdlib.h>
 #include <stdint.h>
 #include <stdio.h>
+#include <string.h>
 
 #include "all_tests.h"
 #include "sample_variable.h"
@@ -201,6 +202,36 @@ static int test_mht_adds_to_new_minute_cause_recycling() {
 }
 
 
+static int test_mht_json_repr() {
+  uint64_t rvs[2];
+  sds repr_sds;
+  VARZMHTIntSampler_t sampler;
+  char *desired_json_repr;
+  VARZMHTIntSamplerInit(&sampler, 11, 4);
+
+  // RV's shouldn't matter since we'll just shove it into both anyway
+  VARZMHTIntSamplerAddSample(&sampler, 59, 1, make2UINT64s(0, 0, 0, 0, rvs));
+  VARZMHTIntSamplerAddSample(&sampler, 61, 2, make2UINT64s(0, 0, 0, 0, rvs));
+
+  repr_sds = sdsempty();
+  VARZMHTIntSamplerJSONRepr(&sampler, &repr_sds);
+
+  desired_json_repr = "{\"latest_time\":61,\"last_minute_samples\":{\"samples\":"
+    "[{\"sample_value\":2,\"sample_time\":61}],\"samples_size\":4,\"num_events\":1},"
+    "\"all_time_samples\":{\"samples\":[{\"sample_value\":1,\"sample_time\":59},"
+    "{\"sample_value\":2,\"sample_time\":61}],\"samples_size\":4,\"num_events\":2}}";
+
+  if (strcmp(desired_json_repr, repr_sds)) {
+    return 1;
+  }
+
+  VARZMHTIntSamplerFree(&sampler);
+  sdsfree(repr_sds);
+  return 0;
+
+}
+
+
 int sample_variable_tests() {
   int failure_count = 0;
 
@@ -213,5 +244,6 @@ int sample_variable_tests() {
   // For MHT
   failure_count += test_mht_add_adds_to_both_variables();
   failure_count += test_mht_adds_to_new_minute_cause_recycling();
+  failure_count += test_mht_json_repr();
   return failure_count;
 }
