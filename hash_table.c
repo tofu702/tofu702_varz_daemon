@@ -75,6 +75,17 @@ void *VARZHashTableGet(VARZHashTable_t *ht, char name[128], uint64_t name_hash) 
 }
 
 
+void VARZHashTableVisit(VARZHashTable_t *ht, VARZHashTableVistor visitor, void *pass_through_data) {
+  for (unsigned int i=0; i < ht->num_slots; i++) {
+    struct VARZHashTableSlot *slot = ht->slots + i;
+    for (unsigned int j=0; j < slot->num_entries; j++) {
+      struct VARZHashTableEntry *entry = slot->entries + j;
+      visitor(entry, pass_through_data);
+    }
+  }
+}
+
+
 /***** STATIC HELPERS *****/
 static unsigned int computeSlot(uint64_t hash_value, unsigned int num_slots) {
   return hash_value % num_slots;

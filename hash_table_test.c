@@ -1,3 +1,4 @@
+#include <stdbool.h>
 #include <stdlib.h>
 #include <stdio.h>
 
@@ -105,6 +106,53 @@ static int test_add_and_get_resolve_for_same_hash_different_strings() {
 }
 
 
+static void visit_test_visitor(struct VARZHashTableEntry *entry, void *results) {
+  void **results_arr = (void**) results;
+  int *counter = (int *)results_arr[0];
+  char **values = (char **)results_arr[1];
+  values[*counter] = entry->value;
+  (*counter) ++;
+}
+
+static bool arr_contains(char **arr, int arr_len, char *ptr) {
+  for (int i=0; i < arr_len; i++) {
+    if (arr[i] == ptr) {
+      return true;
+    }
+  }
+  return false;
+}
+
+
+static int test_visit() {
+  char dummy1[3], dummy2[3], dummy3[3];
+  int count = 0;
+  char *values[3];
+  void *results[2];
+  results[0] = &count;
+  results[1] = values;
+  VARZHashTable_t ht;
+
+  VARZHashTableInit(&ht, 4);
+  VARZHashTableAdd(&ht, "foo", 1, dummy1);
+  VARZHashTableAdd(&ht, "bar", 1, dummy2);
+  VARZHashTableAdd(&ht, "baz", 2, dummy3);
+
+  VARZHashTableVisit(&ht, &visit_test_visitor, results);
+  if (count != 3) {
+    return 1;
+  } else if (!arr_contains(values, 3, dummy1)) {
+    return 1;
+  } else if (!arr_contains(values, 3, dummy2)) {
+    return 1;
+  } else if (!arr_contains(values, 3, dummy3)) {
+    return 1;
+  }
+  VARZHashTableFree(&ht);
+  return 0;
+}
+
+
 int hash_table_tests() {
   int failure_count = 0;
   
@@ -112,6 +160,7 @@ int hash_table_tests() {
   failure_count += test_get_for_non_existant_value_returns_null();
   failure_count += test_add_and_get_resolve_for_multiple_items_in_same_slot();
   failure_count += test_add_and_get_resolve_for_same_hash_different_strings();
+  failure_count += test_visit();
 
   return failure_count;
 }

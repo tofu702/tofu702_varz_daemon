@@ -29,7 +29,9 @@ typedef struct {
   struct VARZHashTableSlot *slots;
   unsigned int num_slots;
   unsigned int total_entries;
-} VARZHashTable_t; 
+} VARZHashTable_t;
+
+typedef void VARZHashTableVistor (struct VARZHashTableEntry *entry, void *data);
 
 
 void VARZHashTableInit(VARZHashTable_t *ht, unsigned int num_slots); 
@@ -38,9 +40,10 @@ void VARZHashTableFree(VARZHashTable_t *ht);
 
 void VARZHashTableAdd(VARZHashTable_t *ht, char name[128], uint64_t name_hash, void *value);
 
-
 // Return NULL if entry not found
 void *VARZHashTableGet(VARZHashTable_t *ht, char name[128], uint64_t name_hash);
+
+void VARZHashTableVisit(VARZHashTable_t *ht, VARZHashTableVistor visitor, void *pass_through_data);
 
 
 #endif
