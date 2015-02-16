@@ -27,9 +27,8 @@ void VARZJSONDictEnd(sds *dest);
 // Includes the trailing ':'
 void VARZJSONDictKey(sds *dest, char *unquoted_name);
 
-
+void VARZJSONStringRepr(sds *dest, char *s);
 void VARZJSONUnsignedLongRepr(sds *dest, unsigned long l);
-
 void VARZJSONTimeRepr(sds *dest, varz_time_t time);
 
 

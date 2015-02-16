@@ -116,6 +116,16 @@ static int test_dict_with_quote_in_key() {
   return 0;
 }
 
+static int test_string_repr() {
+  sds repr_sds = sdsempty();
+  VARZJSONStringRepr(&repr_sds, "foo\"bar");
+  if(strcmp("\"foo\\\"bar\"", repr_sds)) {
+    return 1;
+  }
+  sdsfree(repr_sds);
+  return 0;
+}
+
 static int test_unsigned_long_repr() {
   sds repr_sds = sdsempty();
   VARZJSONUnsignedLongRepr(&repr_sds, 123456789012L);
@@ -137,6 +147,7 @@ int json_helpers_tests() {
   failure_count += test_dict_end();
   failure_count += test_dict_with_normal_key();
   failure_count += test_dict_with_quote_in_key();
+  failure_count += test_string_repr();
   failure_count += test_time_repr();
   failure_count += test_unsigned_long_repr();
 

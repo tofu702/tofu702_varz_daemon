@@ -51,6 +51,12 @@ void VARZJSONDictKey(sds *dest, char *unquoted_name) {
 }
 
 
+void VARZJSONStringRepr(sds *dest, char *s) {
+  // TODO: This probably isn't the right function to use, let's make our own for JSON
+  *dest = sdscatrepr(*dest, s, strlen(s));
+}
+
+
 void VARZJSONUnsignedLongRepr(sds *dest, unsigned long l) {
   sdscatprintf_ptr(dest, "%lu", l);
 }
