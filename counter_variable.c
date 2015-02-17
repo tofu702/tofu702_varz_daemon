@@ -39,7 +39,7 @@ void VARZMHTIntCounterIncrement(VARZMHTIntCounter_t *counter, varz_time_t sample
   // We always update the all time count
   counter->all_time_count += amt;
 
-  if(sample_min_since_epoch < counter_min_since_epoch - MIN_IN_HOUR) {
+  if(sample_min_since_epoch + MIN_IN_HOUR < counter_min_since_epoch) {
     //This sample is more than 1 hour old, discard it and return
     return;
   }

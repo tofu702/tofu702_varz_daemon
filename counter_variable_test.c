@@ -29,6 +29,30 @@ static int test_counter_trivial_increments() {
   return 0;
 }
 
+static int test_counter_with_start_time_of_zero() {
+  VARZMHTIntCounter_t counter; 
+  unsigned long base_sec_since_epoch = VARZMakeTime(0, 0, 0, 0);
+  VARZMHTIntCounterInit(&counter, base_sec_since_epoch);
+  VARZMHTIntCounterIncrement(&counter, base_sec_since_epoch, 1);
+  VARZMHTIntCounterIncrement(&counter, base_sec_since_epoch + 1, 10);
+  VARZMHTIntCounterIncrement(&counter, base_sec_since_epoch+60, 4);
+
+  if (counter.all_time_count != 15) {
+    printf("Error test_counter_trivial_increments, all_time_count should be 15, got %lu\n",
+           counter.all_time_count);
+    return 1;
+  } else if (counter.latest_time != base_sec_since_epoch + 60){
+    return 1;
+  } else if(counter.min_counters[0] != 11) {
+    printf("Error test_counter_trivial_increments, min_counters[0] should be 11, got %lu\n",
+           counter.min_counters[0]);
+    return 1;
+  } else if(counter.min_counters[1] != 4) {
+    return 1;
+  }
+  return 0;
+}
+
 
 static int test_counter_with_older_values() {
   VARZMHTIntCounter_t counter; 
@@ -200,6 +224,7 @@ static int test_counter_json_repr() {
 int counter_variable_tests() {
   int failure_count = 0;
   failure_count += test_counter_trivial_increments();
+  failure_count += test_counter_with_start_time_of_zero();
   failure_count += test_counter_with_older_values();
   failure_count += test_count_pruning();
   failure_count += test_counter_pruning_isnt_off_by_one_on_low_side();
