@@ -44,6 +44,8 @@ struct VARZOperationDescription VARZOpCmdParse(char *cmd) {
     case VARZOP_MHT_SAMPLE_ADD:
       MHTSampleParse(sub_command_pos, &desc);
       break;
+    case VARZOP_ALL_DUMP_JSON:
+      break;
     default:
       desc.op = VARZOP_INVALID;
   }
@@ -58,6 +60,8 @@ static enum VARZOperationType opNameToType(char *name) {
     return VARZOP_MHT_COUNTER_ADD;
   } else if(!strcmp(VARZ_MHT_SAMPLE_ADD_OP_NAME, name)) {
     return VARZOP_MHT_SAMPLE_ADD;
+  } else if(!strcmp(VARZ_ALL_DUMP_JSON_OP_NAME, name)) {
+    return VARZOP_ALL_DUMP_JSON;
   } else {
     return VARZOP_INVALID;
   }
@@ -65,11 +69,16 @@ static enum VARZOperationType opNameToType(char *name) {
 
 // Read the input up to the next space and copy the contents into dest.
 // Returns the number of characters read
-// If we don't find a space in the next dest_len, return -1 and don't populate dest
+// If we don't find a space copies the remaining characters in the string
 static int getNextWord(char *in_string, char *dest, int dest_len) {
   char *loc;
   int word_len;
   loc = strchr(in_string, ' ');
+
+  if (!loc) {
+    loc = in_string + strlen(in_string);
+  }
+
   if (!loc) {
     dest[0] = '\0';
     return -1;
