@@ -131,6 +131,29 @@ static int test_executor_with_repeat_mnt_sampler_add_op() {
 }
 
 
+//TODO: Test the visitor
+static int test_executor_all_dump_json_trivial() {
+  char *expected_result;
+  void *result;
+  VARZExecutor_t executor;
+  struct VARZOperationDescription desc;
+  VARZExecutorInit(&executor, 2);
+
+  bzero(&desc, sizeof(desc));
+  desc.op = VARZOP_ALL_DUMP_JSON;
+
+  result = VARZExecutorExecute(&executor, &desc);
+
+  expected_result = "{\"mht_counters\":[],\"mht_samplers\":[]}";
+  if(strcmp(expected_result, result)) {
+    return 1;
+  }
+  free(result);
+  VARZExecutorFree(&executor);
+  return 0;
+}
+
+
 int executor_tests() {
   int failure_count = 0;
   failure_count += test_executor_ignores_invalid_op();
@@ -138,6 +161,7 @@ int executor_tests() {
   failure_count += test_executor_with_repeat_mnt_counter_add_op();
   failure_count += test_executor_with_new_mnt_sampler_add_op();
   failure_count += test_executor_with_repeat_mnt_sampler_add_op();
+  failure_count += test_executor_all_dump_json_trivial();
 
   return failure_count;
 }
