@@ -1,9 +1,12 @@
 #include <assert.h>
 #include <stdlib.h>
+#include <string.h>
 #include <strings.h>
 
+#include "sds/sds.h"
 
 #include "executor.h"
+#include "json_helpers.h"
 #include "hash_funcs.h"
 #include "hash_table.h"
 
@@ -11,10 +14,25 @@
 #define DEFAULT_START_TIME 0
 #define DEFAULT_SAMPLER_SIZE 1000
 
+/***** HELPER DATA TYPES *****/
+enum EntryType {
+  ETMHTCounter = 1,
+  ETMHTSampler = 2
+};
+struct VisitorData {
+  sds *dest;
+  int counter;
+  enum EntryType type;
+};
+
 
 /***** STATIC HELPER PROTOTYPES *****/
-void handleMHTCounterAdd(VARZExecutor_t *executor, struct VARZOperationDescription *op);
-void handleMHTSamplerAdd(VARZExecutor_t *executor, struct VARZOperationDescription *op);
+static void handleMHTCounterAdd(VARZExecutor_t *executor, struct VARZOperationDescription *op);
+static void handleMHTSamplerAdd(VARZExecutor_t *executor, struct VARZOperationDescription *op);
+static char *handleALLDumpJSON(VARZExecutor_t *executor, struct VARZOperationDescription *op);
+static void JSONReprVisitor(struct VARZHashTableEntry *entry, void *data);
+static void MHTCountersJSONRepr(VARZExecutor_t *executor, sds *dest);
+static void MHTSamplersJSONRepr(VARZExecutor_t *executor, sds *dest);
 
 
 /***** INTERFACE IMPLEMENTATION *****/
@@ -43,6 +61,8 @@ void *VARZExecutorExecute(VARZExecutor_t *executor, struct VARZOperationDescript
     case VARZOP_MHT_SAMPLE_ADD:
       handleMHTSamplerAdd(executor, op);
       return NULL;
+    case VARZOP_ALL_DUMP_JSON:
+      return handleALLDumpJSON(executor, op);
   }
 
   // We got an invalid op...
@@ -51,7 +71,7 @@ void *VARZExecutorExecute(VARZExecutor_t *executor, struct VARZOperationDescript
 
 
 /***** STATIC HELPERS *****/
-void handleMHTCounterAdd(VARZExecutor_t *executor, struct VARZOperationDescription *op) {
+static void handleMHTCounterAdd(VARZExecutor_t *executor, struct VARZOperationDescription *op) {
   VARZMHTIntCounter_t *counter;
   struct VARZMHTCounterAddOp *counter_add_op;
   uint64_t name_hash = VARZHashString(op->variable_name);
@@ -69,7 +89,7 @@ void handleMHTCounterAdd(VARZExecutor_t *executor, struct VARZOperationDescripti
 }
 
 
-void handleMHTSamplerAdd(VARZExecutor_t *executor, struct VARZOperationDescription *op) {
+static void handleMHTSamplerAdd(VARZExecutor_t *executor, struct VARZOperationDescription *op) {
   VARZMHTIntSampler_t *sampler;
   struct VARZMHTSamplerAddOp *sampler_add_op;
   uint64_t name_hash = VARZHashString(op->variable_name);
@@ -85,3 +105,77 @@ void handleMHTSamplerAdd(VARZExecutor_t *executor, struct VARZOperationDescripti
                              sampler_add_op->random_vals);
 }
 
+static char *handleALLDumpJSON(VARZExecutor_t *executor, struct VARZOperationDescription *op) {
+  char *returnme;
+  sds return_sds = sdsempty();
+  sds *dest = &return_sds;
+  VARZJSONDictStart(dest);
+  VARZJSONDictKey(dest, "mht_counters");
+  MHTCountersJSONRepr(executor, dest);
+
+  VARZJSONDictNextKey(dest);
+  VARZJSONDictKey(dest, "mht_samplers");
+  MHTSamplersJSONRepr(executor, dest);
+
+  VARZJSONDictEnd(dest);
+
+  returnme = strdup(return_sds);
+  sdsfree(return_sds);
+  return returnme;
+}
+
+
+static void JSONReprVisitor(struct VARZHashTableEntry *entry, void *data) {
+  struct VisitorData *vd = (struct VisitorData*) data;
+  sds *dest = vd->dest;
+  if (vd->counter != 0) {
+    VARZJSONArrayNextItem(dest);
+  }
+
+  VARZJSONDictStart(dest);
+
+  VARZJSONDictKey(dest, "name");
+  VARZJSONStringRepr(dest, entry->name);
+
+  VARZJSONDictNextKey(dest);
+  VARZJSONDictKey(dest, "value");
+  switch (vd->type) {
+    case ETMHTCounter:
+      VARZMHTIntCounterJSONRepr(entry->value, dest);
+      break;
+    case ETMHTSampler:
+      VARZMHTIntSamplerJSONRepr(entry->value, dest);
+      break;
+  }
+
+  VARZJSONDictNextKey(dest);
+  VARZJSONDictKey(dest, "name_hash");
+  VARZJSONUnsignedLongRepr(dest, entry->name_hash);
+
+  VARZJSONDictEnd(dest);
+  vd->counter ++;
+}
+
+
+static void MHTCountersJSONRepr(VARZExecutor_t *executor, sds *dest) {
+  struct VisitorData vd;
+  vd.dest = dest;
+  vd.counter = 0;
+  vd.type = ETMHTCounter;
+
+  VARZJSONArrayStart(dest);
+  VARZHashTableVisit(&(executor->mht_counters_ht), &JSONReprVisitor, &vd);
+  VARZJSONArrayEnd(dest);
+}
+
+
+static void MHTSamplersJSONRepr(VARZExecutor_t *executor, sds *dest) {
+  struct VisitorData vd;
+  vd.dest = dest;
+  vd.counter = 0;
+  vd.type = ETMHTSampler;
+
+  VARZJSONArrayStart(dest);
+  VARZHashTableVisit(&(executor->mht_samplers_ht), &JSONReprVisitor, &vd);
+  VARZJSONArrayEnd(dest);
+}
