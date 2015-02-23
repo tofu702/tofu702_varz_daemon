@@ -1,3 +1,5 @@
+#include <sys/time.h>
+
 #include "time_utils.h"
 
 
@@ -14,4 +16,11 @@ varz_time_t VARZMakeTime(unsigned long days, unsigned long hours, unsigned long 
   sec += min * SEC_IN_MIN;
 
   return sec;
+}
+
+double VARZCurrentDoubleTime() {
+  struct timeval tp;
+  gettimeofday(&tp, NULL);
+
+  return ((double)tp.tv_sec) + ((double)tp.tv_usec/1.0e6);
 }

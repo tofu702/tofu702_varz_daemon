@@ -13,5 +13,6 @@ unsigned long VARZMinutesSinceEpoch(varz_time_t time);
 /**** DEBUGGING & TESTING ONLY *****/
 varz_time_t VARZMakeTime(unsigned long days, unsigned long hours, unsigned long min, 
                          unsigned long sec);
+double VARZCurrentDoubleTime();
 
 #endif
