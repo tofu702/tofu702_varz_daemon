@@ -92,16 +92,16 @@ static void benchmark_executor() {
   }
   end_time = VARZCurrentDoubleTime();
   
-  printf("Executor Benchmark started at: %f, ended at: %f, elapsed: %f\n", start_time, end_time,
-         end_time-start_time);
+  printf("Executor Benchmark started at: %f, ended at: %f, elapsed: %f, ops per sec: %f\n", start_time, end_time,
+         end_time-start_time, num_commmands/(end_time-start_time));
   
   start_time = VARZCurrentDoubleTime();
   op = allDumpJsonOp();
   json_dump = (char *) VARZExecutorExecute(&executor, &op);
   end_time = VARZCurrentDoubleTime();
   
-  printf("JSON Dump Benchmark started at: %f, ended at: %f, elapsed: %f, len=%lu\n", start_time, 
-         end_time, end_time-start_time, strlen(json_dump));
+  printf("JSON Dump Benchmark started at: %f, ended at: %f, elapsed: %f, len=%lu, MB/s:%f\n", start_time, 
+         end_time, end_time-start_time, strlen(json_dump), strlen(json_dump) / 1024.0 / 1024.0 / (end_time-start_time));
   free(json_dump);
 
 
