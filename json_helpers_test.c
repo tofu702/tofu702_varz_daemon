@@ -141,6 +141,29 @@ static int test_unsigned_long_repr() {
   sds repr_sds = sdsempty();
   VARZJSONUnsignedLongRepr(&repr_sds, 123456789012L);
   if(strcmp("123456789012", repr_sds)) {
+    printf("ERROR test_unsigned_long_repr: expected:'123456789012', got '%s'\n", repr_sds);
+    return 1;
+  }
+  sdsfree(repr_sds);
+  return 0;
+}
+
+static int test_unsigned_long_repr_for_zero() {
+  sds repr_sds = sdsempty();
+  VARZJSONUnsignedLongRepr(&repr_sds, 0);
+  if(strcmp("0", repr_sds)) {
+    printf("ERROR test_unsigned_long_repr_for_zero: expected:'0', got '%s'\n", repr_sds);
+    return 1;
+  }
+  sdsfree(repr_sds);
+  return 0;
+}
+
+static int test_unsigned_long_repr_for_one_char_string() {
+  sds repr_sds = sdsempty();
+  VARZJSONUnsignedLongRepr(&repr_sds, 2);
+  if(strcmp("2", repr_sds)) {
+    printf("ERROR test_unsigned_long_repr_for_zero: expected:'2', got '%s'\n", repr_sds);
     return 1;
   }
   sdsfree(repr_sds);
@@ -162,6 +185,8 @@ int json_helpers_tests() {
   failure_count += test_string_repr();
   failure_count += test_time_repr();
   failure_count += test_unsigned_long_repr();
+  failure_count += test_unsigned_long_repr_for_zero();
+  failure_count += test_unsigned_long_repr_for_one_char_string();
 
   return failure_count;
 }

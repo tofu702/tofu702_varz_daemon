@@ -6,6 +6,7 @@
 static void sdscatprintf_ptr(sds *s_ptr, const char *fmt, ...);
 static void append_escaped_json_string(sds *s_ptr, char *str);
 static int add_backslash_escaped_to_buf(char *buf, char c);
+static void append_unsigned_long(sds *dest, unsigned long val);
 
 /*****INTERFACE IMPLEMENTATION*****/
 
@@ -47,27 +48,20 @@ void VARZJSONDictEnd(sds *dest) {
 }
 
 void VARZJSONDictKey(sds *dest, char *unquoted_name) {
-  // TODO: This probably isn't the right function to use, let's make our own for JSON
-  //*dest = sdscatrepr(*dest, unquoted_name, strlen(unquoted_name));
   append_escaped_json_string(dest, unquoted_name);
   *dest = sdscat(*dest, ":");
 }
 
-
 void VARZJSONStringRepr(sds *dest, char *s) {
-  // TODO: This probably isn't the right function to use, let's make our own for JSON
-  //*dest = sdscatrepr(*dest, s, strlen(s));
   append_escaped_json_string(dest, s);
 }
 
-
 void VARZJSONUnsignedLongRepr(sds *dest, unsigned long l) {
-  sdscatprintf_ptr(dest, "%lu", l);
+  append_unsigned_long(dest, l);
 }
 
-
 void VARZJSONTimeRepr(sds *dest, varz_time_t time) {
-  sdscatprintf_ptr(dest, "%lu", time);
+  append_unsigned_long(dest, time);
 }
 
 
@@ -141,4 +135,27 @@ static int add_backslash_escaped_to_buf(char *buf, char c) {
   buf[0] = '\\';
   buf[1] = c;
   return 2;
+}
+
+
+static void append_unsigned_long(sds *dest, unsigned long val) {
+  int buf_len = 32, next_char_buf_pos;
+  char buf[buf_len];
+  next_char_buf_pos = buf_len - 1;
+  buf[next_char_buf_pos] = '\0';
+  next_char_buf_pos --;
+
+  if (val == 0) {
+    buf[next_char_buf_pos] = '0';
+    next_char_buf_pos --;
+  } else {
+    while (val != 0) {
+      char next_char = (val % 10) + '0';
+      buf[next_char_buf_pos] = next_char;
+      next_char_buf_pos --;
+      val /= 10;
+    }
+  }
+  char *str_ptr = (buf + next_char_buf_pos + 1);
+  *dest = sdscat(*dest, str_ptr);
 }
