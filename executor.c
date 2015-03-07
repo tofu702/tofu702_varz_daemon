@@ -33,6 +33,8 @@ static char *handleALLDumpJSON(VARZExecutor_t *executor, struct VARZOperationDes
 static void JSONReprVisitor(struct VARZHashTableEntry *entry, void *data);
 static void MHTCountersJSONRepr(VARZExecutor_t *executor, sds *dest);
 static void MHTSamplersJSONRepr(VARZExecutor_t *executor, sds *dest);
+static void MHTCounterFreeVisitor(struct VARZHashTableEntry *entry, void *data);
+static void MHTSamplersFreeVisitor(struct VARZHashTableEntry *entry, void *data);
 
 
 /***** INTERFACE IMPLEMENTATION *****/
@@ -45,7 +47,9 @@ void VARZExecutorInit(VARZExecutor_t *executor, unsigned long hash_table_size) {
 
 void VARZExecutorFree(VARZExecutor_t *executor) {
   // TODO: Go through the hash table and free its contents
+  VARZHashTableVisit(&(executor->mht_counters_ht), MHTCounterFreeVisitor, NULL);
   VARZHashTableFree(&(executor->mht_counters_ht));
+  VARZHashTableVisit(&(executor->mht_samplers_ht), MHTSamplersFreeVisitor, NULL);
   VARZHashTableFree(&(executor->mht_samplers_ht));
 }
 
@@ -179,3 +183,13 @@ static void MHTSamplersJSONRepr(VARZExecutor_t *executor, sds *dest) {
   VARZHashTableVisit(&(executor->mht_samplers_ht), &JSONReprVisitor, &vd);
   VARZJSONArrayEnd(dest);
 }
+
+static void MHTCounterFreeVisitor(struct VARZHashTableEntry *entry, void *data) {
+  free(entry->value);
+}
+
+static void MHTSamplersFreeVisitor(struct VARZHashTableEntry *entry, void *data) {
+  VARZMHTIntSamplerFree((VARZMHTIntSampler_t*)entry->value);
+  free(entry->value);
+}
+
