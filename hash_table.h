@@ -36,6 +36,8 @@ typedef void VARZHashTableVistor (struct VARZHashTableEntry *entry, void *data);
 
 void VARZHashTableInit(VARZHashTable_t *ht, unsigned int num_slots); 
 
+// Does not free hash table values, you must write a visitor and run it with VARZHashTableVisit
+// to free contents
 void VARZHashTableFree(VARZHashTable_t *ht); 
 
 void VARZHashTableAdd(VARZHashTable_t *ht, char name[128], uint64_t name_hash, void *value);
