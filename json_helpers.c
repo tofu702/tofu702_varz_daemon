@@ -157,5 +157,5 @@ static void append_unsigned_long(sds *dest, unsigned long val) {
     }
   }
   char *str_ptr = (buf + next_char_buf_pos + 1);
-  *dest = sdscat(*dest, str_ptr);
+  *dest = sdscatlen(*dest, str_ptr, buf_len-(next_char_buf_pos+2));
 }
