@@ -1,4 +1,5 @@
 UDP Command Format
+------------------
 COMMAND -> OPERATION VARIABLE TIME VALUE
 OPERATIONS: "MHTCOUNTERADD" | "MHTSAMPLEADD"
 VARIABLE: ALPHANUMERIC + "_" 
@@ -12,3 +13,11 @@ Examples:
 MHTCOUNTERADD lookup_request 1420960985123 2
 MHTSAMPLEADD lookup_request_latency_ms 1420960985123 231
 ALLDUMPJSON
+
+
+JSON Output Format
+------------------
+ALL_DUMP_JSON = {"mht_counters": [<COUNTER_JSON>], "mht_samplers": [<SAMPLER_JSON>]}
+COUNTER_JSON = {"min_counters": [int], "all_time_count": int, "latest_time": time_int}
+SAMPLER_JSON = {"sample_values": [int], "sample_times": [int], "samples_size": int,
+                "num_events": int}
