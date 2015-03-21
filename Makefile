@@ -8,6 +8,8 @@ BENCH_SOURCES=$(SOURCES) benchmark.c
 TEST_FLAGS=-D VARZ_STUB
 DAEMON_SOURCES=$(SOURCES) daemon.c
 
+VALGRIND_FLAGS=--leak-check=full --show-leak-kinds=all
+
 build: build_test build_daemon
 
 build_daemon: $(DAEMON_SOURCES)
@@ -22,5 +24,12 @@ build_test: $(TEST_SOURCES)
 test: build_test
 	./test
 
+valgrind_test: build_test
+	valgrind $(VALGRIND_FLAGS) --suppressions=valgrind_test.suppressions ./test
+
 bench: build_bench
 	./bench
+
+valgrind_bench: build_bench
+	valgrind $(VALGRIND_FLAGS) ./bench
+

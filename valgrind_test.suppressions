@@ -1,0 +1,11 @@
+{
+   test_stub_suppressions
+   Memcheck:Leak
+   match-leak-kinds: reachable
+   fun:calloc
+   fun:VARZRand64StubValues
+   fun:test_sample_parser_with_legal_input
+   fun:input_parser_tests
+   fun:main
+}
+
