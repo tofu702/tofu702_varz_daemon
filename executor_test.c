@@ -139,7 +139,7 @@ static int test_executor_all_dump_json_trivial() {
   struct VARZOperationDescription desc;
   VARZExecutorInit(&executor, 2);
 
-  bzero(&desc, sizeof(desc));
+  memset(&desc, 0, sizeof(desc));
   desc.op = VARZOP_ALL_DUMP_JSON;
 
   result = VARZExecutorExecute(&executor, &desc);

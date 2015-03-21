@@ -1,7 +1,6 @@
 #include <assert.h>
 #include <stdlib.h>
 #include <string.h>
-#include <strings.h>
 
 #include "hash_table.h"
 
@@ -12,7 +11,7 @@ static unsigned int computeSlot(uint64_t hash_value, unsigned int num_slots);
 /***** INTERFACE IMPLEMENTATION *****/
 
 void VARZHashTableInit(VARZHashTable_t *ht, unsigned int num_slots) {
-  bzero(ht, sizeof(VARZHashTable_t));
+  memset(ht, 0, sizeof(VARZHashTable_t));
   ht->num_slots = num_slots;
   ht->slots = calloc(num_slots, sizeof(struct VARZHashTableSlot));
 }
@@ -26,7 +25,7 @@ void VARZHashTableFree(VARZHashTable_t *ht) {
   free(ht->slots);
 
   //Not strictly needed but should throw more obvious errors if accessed illegally
-  bzero(ht, sizeof(VARZHashTable_t));
+  memset(ht, 0, sizeof(VARZHashTable_t));
 }
 
 

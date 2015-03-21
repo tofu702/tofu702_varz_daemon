@@ -1,4 +1,5 @@
 #include <assert.h>
+#include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 
@@ -9,8 +10,15 @@
 #ifndef VARZ_STUB
 
 void VARZRandReseed() {
-  sranddev();
+  FILE *infile;
+  unsigned seed;
+  infile = fopen("/dev/random", "rb");
+  assert(infile);
+  assert(fread(&seed, 1, sizeof(seed), infile) == 1);
+  fclose(infile);
+  srand(seed);
 }
+
 
 uint64_t VARZRand64() {
   return (((uint64_t) rand()) << 34) | (((uint64_t) rand()) << 2) | ((uint64_t) rand() % 4);
@@ -27,7 +35,7 @@ uint64_t *varz_rand64_stub_values = NULL;
 unsigned int varz_rand64_stub_num_values = 0;
 unsigned int varz_rand64_stub_cur_idx = 0;
 
-void VARZRandSeed() {
+void VARZRandReseed() {
   return; // NOOP
 }
 

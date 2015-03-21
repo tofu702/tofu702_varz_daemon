@@ -2,7 +2,7 @@
 #include <stdbool.h>
 #include <stdio.h>
 #include <stdlib.h>
-#include <strings.h>
+#include <string.h>
 
 #include "json_helpers.h"
 #include "numeric_utils.h"
@@ -15,7 +15,7 @@ static bool shouldWeReplaceElement(unsigned long num_events_inc_this_one, unsign
 /***** VARZMHTIntSample Implementation *****/
 void VARZMHTIntSamplerInit(VARZMHTIntSampler_t *sampler, varz_time_t start_time,
                            unsigned int samples_per_set) {
-  bzero(sampler, sizeof(VARZMHTIntSampler_t));
+  memset(sampler, 0, sizeof(VARZMHTIntSampler_t));
   VARZIntSampleSetInit(&(sampler->min_samples), samples_per_set);
   VARZIntSampleSetInit(&(sampler->all_time_samples), samples_per_set);
   sampler->latest_time = start_time;
@@ -68,7 +68,7 @@ void VARZMHTIntSamplerJSONRepr(VARZMHTIntSampler_t *sampler, sds *dest) {
 
 /***** VARZIntSampleSet Implementation *****/
 void VARZIntSampleSetInit(VARZIntSampleSet_t *sample_set, unsigned long samples_size) {
-  bzero(sample_set, sizeof(VARZIntSampleSet_t));
+  memset(sample_set, 0, sizeof(VARZIntSampleSet_t));
   sample_set->samples_size = samples_size;
   sample_set->samples = calloc(samples_size, sizeof(VARZIntSample_t));
 }

@@ -1,7 +1,6 @@
 #include <assert.h>
 #include <stdlib.h>
 #include <string.h>
-#include <strings.h>
 
 #include "sds/sds.h"
 
@@ -40,7 +39,7 @@ static void MHTSamplersFreeVisitor(struct VARZHashTableEntry *entry, void *data)
 /***** INTERFACE IMPLEMENTATION *****/
 
 void VARZExecutorInit(VARZExecutor_t *executor, unsigned long hash_table_size) {
-  bzero(executor, sizeof(VARZExecutor_t));
+  memset(executor, 0, sizeof(VARZExecutor_t));
   VARZHashTableInit(&(executor->mht_counters_ht), hash_table_size);
   VARZHashTableInit(&(executor->mht_samplers_ht), hash_table_size);
 }

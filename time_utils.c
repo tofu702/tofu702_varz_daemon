@@ -1,3 +1,5 @@
+#include <string.h> //For NULL
+
 #include <sys/time.h>
 
 #include "time_utils.h"

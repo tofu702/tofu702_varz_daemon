@@ -1,6 +1,6 @@
 #include <assert.h>
 #include <stdio.h>
-#include <strings.h>
+#include <string.h>
 
 #include "sds/sds.h"
 
@@ -28,7 +28,7 @@ static void pruneToCurrentTime(VARZMHTIntCounter_t *counter, varz_time_t newest_
 /*****INTERFACE IMPLEMENTATION*****/
 
 void VARZMHTIntCounterInit(VARZMHTIntCounter_t *counter, varz_time_t start_time) {
-  bzero(counter, sizeof(VARZMHTIntCounter_t));
+  memset(counter, 0, sizeof(VARZMHTIntCounter_t));
   counter->latest_time = start_time;
 }
 

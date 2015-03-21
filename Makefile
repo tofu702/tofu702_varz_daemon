@@ -1,6 +1,6 @@
 CC=gcc
-CFLAGS=-Wall -std=c99 -g
-BENCH_CFLAGS=-O3 -std=c99
+CFLAGS=-Wall -std=c99 -g -D _POSIX_C_SOURCE=200809L
+BENCH_CFLAGS=$(CFLAGS) -O3
 THIRDPARTY_SOURCES=sds/sds.c
 SOURCES=$(THIRDPARTY_SOURCES) counter_variable.c time_utils.c sample_variable.c hash_table.c json_helpers.c input_parser.c random.c hash_funcs.c executor.c
 TEST_SOURCES=$(SOURCES) counter_variable_test.c sample_variable_test.c executor_test.c hash_table_test.c json_helpers_test.c input_parser_test.c all_tests.c

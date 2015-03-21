@@ -1,7 +1,7 @@
 #include <errno.h>
 #include <stdio.h>
 #include <stdlib.h>
-#include <strings.h>
+#include <string.h>
 #include <unistd.h>
 
 
@@ -71,7 +71,7 @@ static int setupUDPSocketAndReturnFD() {
     exit(1);
   }
 
-  bzero(&myaddr, sizeof(struct sockaddr_in));
+  memset(&myaddr, 0, sizeof(struct sockaddr_in));
   myaddr.sin_family = AF_INET;
   myaddr.sin_addr.s_addr = htonl(INADDR_ANY);
   myaddr.sin_port = htons(UDP_PORT);
@@ -93,7 +93,7 @@ static int setupTCPSocketAndReturnFD() {
     exit(1);
   }
   
-  bzero(&myaddr, sizeof(struct sockaddr_in));
+  memset(&myaddr, 0, sizeof(struct sockaddr_in));
   myaddr.sin_family = AF_INET;
   myaddr.sin_addr.s_addr = htonl(INADDR_ANY);
   myaddr.sin_port = htons(TCP_PORT);
