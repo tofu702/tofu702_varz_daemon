@@ -42,7 +42,6 @@ int main(int argc, char **argv) {
 
 
   VARZExecutorInit(&executor, EXECUTOR_HT_SIZE);
-  printf("udp_fd=%d, tcp_fd=%d\n", udp_fd, tcp_fd);
 
   while (1) {
     FD_ZERO(&readfds);
@@ -109,22 +108,18 @@ static int setupTCPSocketAndReturnFD() {
 static void handleUDPPacket(int udp_fd, VARZExecutor_t *executor) {
   uint8_t recv_buf[RECV_BUFSIZE];
   int len;
-  struct sockaddr_in src_addr;
   struct VARZOperationDescription desc;
   socklen_t src_addr_len;
 
   src_addr_len = sizeof(struct sockaddr_in);
   //Do the -1 to allow for the NULL terminator
-  len = recvfrom(udp_fd, recv_buf, RECV_BUFSIZE-1, 0, (struct sockaddr *)&src_addr, &src_addr_len);
+  len = recv(udp_fd, recv_buf, RECV_BUFSIZE-1, 0);
   recv_buf[len] = '\0';
   desc = VARZOpCmdParse((char*)recv_buf);
-
-  printf("recv_buf=%s; desc.op=%d\n", recv_buf, (int)desc.op);
 
   void *result = VARZExecutorExecute(executor, &desc);
   //TODO: REMOVE & Return
   if (result) {
-    printf("%s\n", (char*) result);
     free(result);
   }
 }
@@ -147,7 +142,6 @@ static void handleNewTCPConnection(int tcp_fd, VARZExecutor_t *executor) {
   recv_buf[len] = '\0';
 
   desc = VARZOpCmdParse((char*)recv_buf);
-  printf("TCP FD: %d; COMMAND: %s; desc.op=%d\n", conn_fd, recv_buf, (int)desc.op);
 
   void *result = VARZExecutorExecute(executor, &desc);
   if (result) {
