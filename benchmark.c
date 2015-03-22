@@ -106,6 +106,4 @@ static void benchmark_executor() {
 
 
   VARZExecutorFree(&executor);
-
-
 }
