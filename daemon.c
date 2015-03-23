@@ -121,9 +121,7 @@ static void handleUDPPacket(int udp_fd, VARZExecutor_t *executor) {
   uint8_t recv_buf[RECV_BUFSIZE];
   int len;
   struct VARZOperationDescription desc;
-  socklen_t src_addr_len;
 
-  src_addr_len = sizeof(struct sockaddr_in);
   //Do the -1 to allow for the NULL terminator
   len = recv(udp_fd, recv_buf, RECV_BUFSIZE-1, 0);
   recv_buf[len] = '\0';
