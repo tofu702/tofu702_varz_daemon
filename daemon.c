@@ -64,10 +64,16 @@ int main(int argc, char **argv) {
 static int setupUDPSocketAndReturnFD() {
   int fd; 
   struct sockaddr_in myaddr;
+  int reuse_optval;
 
   if ((fd = socket(AF_INET, SOCK_DGRAM, 0)) < 0) {
     fprintf(stderr, "ERROR CANNOT OPEN UDP SOCKET\n");
     exit(1);
+  }
+
+  reuse_optval = 1;
+  if (setsockopt(fd, SOL_SOCKET, SO_REUSEADDR, &reuse_optval, sizeof(reuse_optval)) != 0) {
+    fprintf(stderr, "ERROR: Unable to set UDP socket to reuse\n");
   }
 
   memset(&myaddr, 0, sizeof(struct sockaddr_in));
@@ -85,13 +91,19 @@ static int setupUDPSocketAndReturnFD() {
 
 static int setupTCPSocketAndReturnFD() {
   int fd;
-  struct sockaddr_in myaddr; 
+  struct sockaddr_in myaddr;
+  int reuse_optval;
 
   if ((fd = socket(AF_INET, SOCK_STREAM, 0)) < 0) {
     fprintf(stderr, "ERROR: CANNOT OPEN TCP SOCKET\n");
     exit(1);
   }
-  
+
+  reuse_optval = 1;
+  if (setsockopt(fd, SOL_SOCKET, SO_REUSEADDR, &reuse_optval, sizeof(reuse_optval)) != 0) {
+    fprintf(stderr, "ERROR: Unable to set UDP socket to reuse\n");
+  }
+
   memset(&myaddr, 0, sizeof(struct sockaddr_in));
   myaddr.sin_family = AF_INET;
   myaddr.sin_addr.s_addr = htonl(INADDR_ANY);
