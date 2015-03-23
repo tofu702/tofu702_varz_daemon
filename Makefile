@@ -1,5 +1,12 @@
+OS := $(shell uname -s)
+ifeq ($(OS),Linux)
+	PLATFORM_FLAGS=-D _POSIX_C_SOURCE=200809L
+else
+	PLATFORM_FLAGS=
+endif
+
 CC=gcc
-CFLAGS=-Wall -std=c99 -g -D _POSIX_C_SOURCE=200809L
+CFLAGS=-Wall -std=c99 -g $(PLATFORM_FLAGS)
 BENCH_CFLAGS=$(CFLAGS) -O3
 THIRDPARTY_SOURCES=sds/sds.c
 SOURCES=$(THIRDPARTY_SOURCES) counter_variable.c time_utils.c sample_variable.c hash_table.c json_helpers.c input_parser.c random.c hash_funcs.c executor.c
@@ -33,3 +40,5 @@ bench: build_bench
 valgrind_bench: build_bench
 	valgrind $(VALGRIND_FLAGS) ./bench
 
+os:
+	echo "$(OS)" "$(PROCESSOR_ARCHITECTURE)"
