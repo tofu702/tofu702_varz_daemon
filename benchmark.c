@@ -67,12 +67,20 @@ static struct VARZOperationDescription allDumpJsonOp() {
   return desc;
 }
 
+
+static struct VARZOperationDescription allListJsonOp() {
+  struct VARZOperationDescription desc;
+  desc.op = VARZOP_ALL_LIST_JSON;
+  return desc;
+}
+
+
 static void benchmark_executor() {
   // Benchmark Only Adds
   VARZExecutor_t executor;
   struct VARZOperationDescription op;
   double start_time, end_time;
-  char *json_dump;
+  char *json_dump, *json_list;
 
   const int num_commmands = 16*1024*1024;
 
@@ -94,16 +102,24 @@ static void benchmark_executor() {
   
   printf("Executor Benchmark started at: %f, ended at: %f, elapsed: %f, ops per sec: %f\n", start_time, end_time,
          end_time-start_time, num_commmands/(end_time-start_time));
-  
+
+  // JSON DUMP
   start_time = VARZCurrentDoubleTime();
   op = allDumpJsonOp();
   json_dump = (char *) VARZExecutorExecute(&executor, &op);
   end_time = VARZCurrentDoubleTime();
-  
   printf("JSON Dump Benchmark started at: %f, ended at: %f, elapsed: %f, len=%lu, MB/s:%f\n", start_time, 
          end_time, end_time-start_time, strlen(json_dump), strlen(json_dump) / 1024.0 / 1024.0 / (end_time-start_time));
   free(json_dump);
 
+  // JSON LIST
+  start_time = VARZCurrentDoubleTime();
+  op = allListJsonOp();
+  json_list = (char *) VARZExecutorExecute(&executor, &op);
+  end_time = VARZCurrentDoubleTime();
+  printf("JSON List Benchmark started at: %f, ended at: %f, elapsed: %f, len=%lu, MB/s:%f\n", start_time, 
+         end_time, end_time-start_time, strlen(json_list), strlen(json_list) / 1024.0 / 1024.0 / (end_time-start_time));
+  free(json_list);
 
   VARZExecutorFree(&executor);
 }

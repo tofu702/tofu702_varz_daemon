@@ -15,6 +15,7 @@
 
 /***** HELPER DATA TYPES *****/
 enum EntryType {
+  ET_UNKNOWN = 0,
   ETMHTCounter = 1,
   ETMHTSampler = 2
 };
@@ -29,6 +30,9 @@ struct VisitorData {
 static void handleMHTCounterAdd(VARZExecutor_t *executor, struct VARZOperationDescription *op);
 static void handleMHTSamplerAdd(VARZExecutor_t *executor, struct VARZOperationDescription *op);
 static char *handleALLDumpJSON(VARZExecutor_t *executor, struct VARZOperationDescription *op);
+static char *handleALLListJSON(VARZExecutor_t *executor, struct VARZOperationDescription *op);
+static void JSONDictKeysList(VARZHashTable_t *ht, sds *dest);
+static void JSONKeyListVisitor(struct VARZHashTableEntry *entry, void *data);
 static void JSONReprVisitor(struct VARZHashTableEntry *entry, void *data);
 static void MHTCountersJSONRepr(VARZExecutor_t *executor, sds *dest);
 static void MHTSamplersJSONRepr(VARZExecutor_t *executor, sds *dest);
@@ -66,6 +70,8 @@ void *VARZExecutorExecute(VARZExecutor_t *executor, struct VARZOperationDescript
       return NULL;
     case VARZOP_ALL_DUMP_JSON:
       return handleALLDumpJSON(executor, op);
+    case VARZOP_ALL_LIST_JSON:
+      return handleALLListJSON(executor, op);
   }
 
   // We got an invalid op...
@@ -128,6 +134,48 @@ static char *handleALLDumpJSON(VARZExecutor_t *executor, struct VARZOperationDes
 }
 
 
+static char *handleALLListJSON(VARZExecutor_t *executor, struct VARZOperationDescription *op) {
+  char *returnme;
+  sds return_sds = sdsempty();
+
+  sds *dest = &return_sds;
+
+  VARZJSONDictStart(dest);
+
+  VARZJSONDictKey(dest, "mht_counters");
+  JSONDictKeysList(&(executor->mht_counters_ht), dest);
+
+  VARZJSONDictNextKey(dest);
+  VARZJSONDictKey(dest, "mht_samplers");
+  JSONDictKeysList(&(executor->mht_samplers_ht), dest);
+
+  VARZJSONDictEnd(dest);
+
+  returnme = strdup(return_sds);
+  sdsfree(return_sds);
+  return returnme;
+}
+
+static void JSONDictKeysList(VARZHashTable_t *ht, sds *dest) {
+  struct VisitorData vd;
+  vd.dest = dest;
+  vd.counter = 0;
+  vd.type = ET_UNKNOWN;
+  VARZJSONArrayStart(dest);
+  VARZHashTableVisit(ht, JSONKeyListVisitor, &vd);
+  VARZJSONArrayEnd(dest);
+}
+
+static void JSONKeyListVisitor(struct VARZHashTableEntry *entry, void *data) {
+  struct VisitorData *vd = (struct VisitorData*) data;
+  sds *dest = vd->dest;
+  if(vd->counter != 0) {
+    VARZJSONArrayNextItem(dest);
+  }
+  VARZJSONStringRepr(dest, entry->name);
+  vd->counter ++;
+}
+
 static void JSONReprVisitor(struct VARZHashTableEntry *entry, void *data) {
   struct VisitorData *vd = (struct VisitorData*) data;
   sds *dest = vd->dest;
@@ -149,6 +197,8 @@ static void JSONReprVisitor(struct VARZHashTableEntry *entry, void *data) {
     case ETMHTSampler:
       VARZMHTIntSamplerJSONRepr(entry->value, dest);
       break;
+    default:
+      assert(1); // Should never pass
   }
 
   VARZJSONDictNextKey(dest);
@@ -191,4 +241,3 @@ static void MHTSamplersFreeVisitor(struct VARZHashTableEntry *entry, void *data)
   VARZMHTIntSamplerFree((VARZMHTIntSampler_t*)entry->value);
   free(entry->value);
 }
-
