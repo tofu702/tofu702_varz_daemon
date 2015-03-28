@@ -46,6 +46,8 @@ struct VARZOperationDescription VARZOpCmdParse(char *cmd) {
       break;
     case VARZOP_ALL_DUMP_JSON:
       break;
+    case VARZOP_ALL_LIST_JSON:
+      break;
     default:
       desc.op = VARZOP_INVALID;
   }
@@ -62,6 +64,8 @@ static enum VARZOperationType opNameToType(char *name) {
     return VARZOP_MHT_SAMPLE_ADD;
   } else if(!strcmp(VARZ_ALL_DUMP_JSON_OP_NAME, name)) {
     return VARZOP_ALL_DUMP_JSON;
+  } else if(!strcmp(VARZ_ALL_LIST_JSON_OP_NAME, name)) {
+    return VARZOP_ALL_LIST_JSON;
   } else {
     return VARZOP_INVALID;
   }
