@@ -51,7 +51,7 @@ void VARZMHTIntSamplerAddSample(VARZMHTIntSampler_t *sample, varz_time_t sample_
 void VARZMHTIntSamplerJSONRepr(VARZMHTIntSampler_t *sampler, sds *dest) {
   VARZJSONDictStart(dest);
 
-  VARZJSONDictKey(dest, "latest_time");
+  VARZJSONDictKey(dest, "latest_time_sec");
   VARZJSONTimeRepr(dest, sampler->latest_time);
 
   VARZJSONDictNextKey(dest);
@@ -143,7 +143,7 @@ void VARZIntSampleSetJSONRepr(VARZIntSampleSet_t *sample_set, sds *dest) {
   *dest = sdscatsds(*dest, values_sds);
 
   VARZJSONDictNextKey(dest);
-  VARZJSONDictKey(dest, "sample_times");
+  VARZJSONDictKey(dest, "sample_times_sec");
   *dest = sdscatsds(*dest, time_sds);
 
   VARZJSONDictNextKey(dest);

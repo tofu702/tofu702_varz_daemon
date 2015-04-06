@@ -216,11 +216,11 @@ static int test_mht_json_repr() {
   repr_sds = sdsempty();
   VARZMHTIntSamplerJSONRepr(&sampler, &repr_sds);
 
-  desired_json_repr = "{\"latest_time\":61,"
+  desired_json_repr = "{\"latest_time_sec\":61,"
       "\"last_minute_samples\":"
-        "{\"sample_values\":[2],\"sample_times\":[61],\"samples_size\":4,\"num_events\":1},"
+        "{\"sample_values\":[2],\"sample_times_sec\":[61],\"samples_size\":4,\"num_events\":1},"
       "\"all_time_samples\":"
-        "{\"sample_values\":[1,2],\"sample_times\":[59,61],\"samples_size\":4,\"num_events\":2}}";
+        "{\"sample_values\":[1,2],\"sample_times_sec\":[59,61],\"samples_size\":4,\"num_events\":2}}";
 
   if (strcmp(desired_json_repr, repr_sds)) {
     printf("ERROR: test_mht_json_repr strings don't match\n");

@@ -63,7 +63,7 @@ void VARZMHTIntCounterJSONRepr(VARZMHTIntCounter_t *counter, sds *dest) {
   VARZJSONUnsignedLongRepr(dest, counter->all_time_count);
 
   VARZJSONDictNextKey(dest);
-  VARZJSONDictKey(dest, "latest_time");
+  VARZJSONDictKey(dest, "latest_time_sec");
   VARZJSONTimeRepr(dest, counter->latest_time);
 
   VARZJSONDictEnd(dest);

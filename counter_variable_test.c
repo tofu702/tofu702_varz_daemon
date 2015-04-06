@@ -212,7 +212,7 @@ static int test_counter_json_repr() {
 
   const char *desired_output = "{\"min_counters\":[3,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,"
      "0,0,0,0,0,0,0,0,2,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],"
-     "\"all_time_count\":6,\"latest_time\":219600}";
+     "\"all_time_count\":6,\"latest_time_sec\":219600}";
   if (strcmp(desired_output, repr_sds)) {
     return 1;
   }
