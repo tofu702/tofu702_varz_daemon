@@ -130,7 +130,6 @@ static int test_executor_with_repeat_mnt_sampler_add_op() {
   return 0;
 }
 
-
 //TODO: Test the visitor
 static int test_executor_all_dump_json_trivial() {
   char *expected_result;
@@ -175,6 +174,33 @@ static int test_executor_all_list_json_trivial() {
   return 0;
 }
 
+static int test_executor_all_flush() {
+  VARZExecutor_t executor;
+  struct VARZOperationDescription desc;
+  VARZExecutorInit(&executor, 2);
+
+  // First create a single variable
+  desc.op = VARZOP_MHT_COUNTER_ADD;
+  strcpy(desc.variable_name, "foobar");
+  desc.op_data.counter_add_op.time = 27;
+  desc.op_data.counter_add_op.amt = 1;
+  VARZExecutorExecute(&executor, &desc);
+
+  // Now flush it to remove it
+  desc.op = VARZOP_ALL_FLUSH;
+  VARZExecutorExecute(&executor, &desc);
+
+  // Now it should be empty
+  if (executor.mht_counters_ht.total_entries != 0) {
+    return 1;
+  } else if(executor.mht_samplers_ht.total_entries != 0) {
+    return 1;
+  }
+
+  VARZExecutorFree(&executor);
+  return 0;
+}
+
 
 int executor_tests() {
   int failure_count = 0;
@@ -185,6 +211,7 @@ int executor_tests() {
   failure_count += test_executor_with_repeat_mnt_sampler_add_op();
   failure_count += test_executor_all_dump_json_trivial();
   failure_count += test_executor_all_list_json_trivial();
+  failure_count += test_executor_all_flush();
 
   return failure_count;
 }

@@ -31,6 +31,7 @@ static void handleMHTCounterAdd(VARZExecutor_t *executor, struct VARZOperationDe
 static void handleMHTSamplerAdd(VARZExecutor_t *executor, struct VARZOperationDescription *op);
 static char *handleALLDumpJSON(VARZExecutor_t *executor, struct VARZOperationDescription *op);
 static char *handleALLListJSON(VARZExecutor_t *executor, struct VARZOperationDescription *op);
+static void handleALLFlush(VARZExecutor_t *executor, struct VARZOperationDescription *op);
 static void JSONDictKeysList(VARZHashTable_t *ht, sds *dest);
 static void JSONKeyListVisitor(struct VARZHashTableEntry *entry, void *data);
 static void JSONReprVisitor(struct VARZHashTableEntry *entry, void *data);
@@ -49,7 +50,6 @@ void VARZExecutorInit(VARZExecutor_t *executor, unsigned long hash_table_size) {
 }
 
 void VARZExecutorFree(VARZExecutor_t *executor) {
-  // TODO: Go through the hash table and free its contents
   VARZHashTableVisit(&(executor->mht_counters_ht), MHTCounterFreeVisitor, NULL);
   VARZHashTableFree(&(executor->mht_counters_ht));
   VARZHashTableVisit(&(executor->mht_samplers_ht), MHTSamplersFreeVisitor, NULL);
@@ -72,6 +72,9 @@ void *VARZExecutorExecute(VARZExecutor_t *executor, struct VARZOperationDescript
       return handleALLDumpJSON(executor, op);
     case VARZOP_ALL_LIST_JSON:
       return handleALLListJSON(executor, op);
+    case VARZOP_ALL_FLUSH:
+      handleALLFlush(executor, op);
+      return NULL;
   }
 
   // We got an invalid op...
@@ -155,6 +158,14 @@ static char *handleALLListJSON(VARZExecutor_t *executor, struct VARZOperationDes
   sdsfree(return_sds);
   return returnme;
 }
+
+
+static void handleALLFlush(VARZExecutor_t *executor, struct VARZOperationDescription *op) {
+  unsigned long hash_table_size = executor->mht_counters_ht.num_slots;
+  VARZExecutorFree(executor);
+  VARZExecutorInit(executor, hash_table_size);
+}
+
 
 static void JSONDictKeysList(VARZHashTable_t *ht, sds *dest) {
   struct VisitorData vd;
