@@ -145,11 +145,23 @@ static int test_all_list_json_operation() {
   struct VARZOperationDescription desc = VARZOpCmdParse(sample_input);
 
   if (desc.op != VARZOP_ALL_LIST_JSON) {
-    printf("ERROR test_all_list_json_operation, op should be %d, got %d\n", VARZOP_ALL_DUMP_JSON,
+    printf("ERROR test_all_list_json_operation, op should be %d, got %d\n", VARZOP_ALL_LIST_JSON,
         desc.op);
     return 1;
   }
   return 0;
+}
+
+static int test_all_flush_operation() {
+  char *sample_input = "ALLFLUSH";
+  struct VARZOperationDescription desc = VARZOpCmdParse(sample_input);
+
+  if (desc.op != VARZOP_ALL_FLUSH) {
+    printf("ERROR test_all_flush_operation, op should be %d, got %d\n", VARZOP_ALL_FLUSH, desc.op);
+    return 1;
+  }
+  return 0;
+
 }
 
 
@@ -166,6 +178,7 @@ int input_parser_tests() {
   failure_count += test_sets_invalid_for_bad_operation_name();
   failure_count += test_all_dump_json_operation();
   failure_count += test_all_list_json_operation();
+  failure_count += test_all_flush_operation();
 
   return failure_count;
 }
