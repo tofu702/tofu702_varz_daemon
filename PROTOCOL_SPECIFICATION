@@ -1,0 +1,39 @@
+All commands are text strings. They generally take the form of some command, optionally followed
+by some arguments. Commands are always terminated by a ';' which is illegal elsewhere in the 
+command.
+
+
+Command Format
+------------------
+COMMAND = (<ADD_COMMAND> | <CONTROL_COMMAND>) ";"
+ADD_COMMAND = <ADD_OPERATION> <VARIABLE_NAME> <TIME> <VALUE>
+ADD_OPERATIONS = "MHTCOUNTERADD" | "MHTSAMPLEADD"
+VARIABLE_NAME = 
+  # Strings consisting of alphanumeric and "_" up to length 128
+TIME = [uint64]
+  # Seconds since the UNIX epoch
+VALUE = [uint64] 
+  # For counters, amount to increment the counter by
+  # For samples, the value of the sample
+CONTROL_COMMAND = "ALLDUMPJSON" | "ALLLISTJSON" | "ALLFLUSH"
+
+
+Examples:
+MHTCOUNTERADD lookup_request 1420960985123 2;
+MHTSAMPLEADD lookup_request_latency_ms 1420960985123 231;
+ALLDUMPJSON;
+ALLLISTJSON;
+ALLFLUSH;
+
+
+JSON Output Format
+------------------
+ALL_DUMP_JSON = {"mht_counters": [<COUNTER_JSON_WRAPPER>], "mht_samplers": [<SAMPLER_JSON_WRAPPER>]}
+ALL_LIST_JSON = {"mht_counters": [string], "mht_samplers": [string]}
+COUNTER_JSON_WRAPPER = {"name": string, "value": <COUNTER_JSON>}
+COUNTER_JSON = {"min_counters": [int], "all_time_count": int, "latest_time_sec": time_int}
+SAMPLER_JSON_WRAPPER = {"name": string, "value": <SAMPLER_JSON>}
+SAMPLER_JSON = {"latest_time_sec": time_int, "last_minute_samples": <SAMPLE_SET_JSON>,
+               "all_time_samples": <SAMPLE_SET_JSON>}
+SAMPLE_SET_JSON = {"sample_values": [int], "sample_times_sec": [int], "samples_size": int,
+                "num_events": int}
