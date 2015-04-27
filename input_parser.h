@@ -12,7 +12,7 @@
 #define VARZ_ALL_FLUSH_OP_NAME "ALLFLUSH"
 
 
-struct VARZOperationDescription VARZOpCmdParse(char *cmd);
+struct VARZOperationDescription VARZOpCmdParse(char *cmd, int cmd_len);
 
 
 #endif

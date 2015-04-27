@@ -125,7 +125,7 @@ static void handleUDPPacket(int udp_fd, VARZExecutor_t *executor) {
   //Do the -1 to allow for the NULL terminator
   len = recv(udp_fd, recv_buf, RECV_BUFSIZE-1, 0);
   recv_buf[len] = '\0';
-  desc = VARZOpCmdParse((char*)recv_buf);
+  desc = VARZOpCmdParse((char*)recv_buf, len);
 
   void *result = VARZExecutorExecute(executor, &desc);
   //TODO: REMOVE & Return
@@ -151,7 +151,7 @@ static void handleNewTCPConnection(int tcp_fd, VARZExecutor_t *executor) {
   len = recv(conn_fd, recv_buf, sizeof(recv_buf)-1, 0);
   recv_buf[len] = '\0';
 
-  desc = VARZOpCmdParse((char*)recv_buf);
+  desc = VARZOpCmdParse((char*)recv_buf, len);
 
   void *result = VARZExecutorExecute(executor, &desc);
   if (result) {

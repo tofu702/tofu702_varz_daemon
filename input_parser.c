@@ -14,13 +14,27 @@ void MHTSampleParse(char *cmd_remainder, struct VARZOperationDescription *dest);
 
 /***** INTERFACE IMPLEMENTATION *****/
 
-struct VARZOperationDescription VARZOpCmdParse(char *cmd) {
+struct VARZOperationDescription VARZOpCmdParse(char *cmd, int cmd_len) {
+  // TODO: This whole function is sorta ugly & hackish, refactor it into something nicer
   struct VARZOperationDescription desc;
-  char op[VARZ_MAX_OP_LEN];
+  char cmd_copy[cmd_len+1], op[VARZ_MAX_OP_LEN];
   int op_len, var_name_len;
 
+  // Copy (We could potentially do this destructively instead)
+  strncpy(cmd_copy, cmd, cmd_len);
+  cmd_copy[cmd_len] = '\0';
+
+  // Check for trailing ';'
+  if (cmd_copy[cmd_len-1] != ';') {
+    desc.op = VARZOP_INVALID;
+    return desc;
+  }
+
+  // Otherwise it will be combined with the last string element
+  cmd_copy[cmd_len-1] = '\0';
+
   // Parse out the op
-  op_len = getNextWord(cmd, op, VARZ_MAX_OP_LEN);
+  op_len = getNextWord(cmd_copy, op, VARZ_MAX_OP_LEN);
   if (op_len < 0) {
     desc.op = VARZOP_INVALID;
     return desc;
@@ -28,7 +42,7 @@ struct VARZOperationDescription VARZOpCmdParse(char *cmd) {
   desc.op = opNameToType(op);
 
   // Parse out the name
-  char *var_name_pos = cmd + op_len + 1;
+  char *var_name_pos = cmd_copy + op_len + 1;
   var_name_len = getNextWord(var_name_pos, desc.variable_name, VARZ_HASHTABLE_MAX_NAME_LEN);
   if (var_name_len < 0) {
     desc.op = VARZOP_INVALID;
