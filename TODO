@@ -1,0 +1,4 @@
+- Better VARZOpCmdParse
+- Fuzzer
+- Better internal documentation
+- New variable type: String value
