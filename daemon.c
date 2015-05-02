@@ -147,7 +147,12 @@ static void handleNewTCPConnection(int tcp_fd, VARZExecutor_t *executor) {
     fprintf(stderr, "Unable to get FD for TCP accept()\n");
     exit(1);
   }
-  
+
+  // SIGPIPES crash the whole program...
+  int disable_sigpipe = 1;
+  setsockopt(conn_fd, SOL_SOCKET, SO_NOSIGPIPE, &disable_sigpipe, sizeof(disable_sigpipe));
+
+  // TODO: We might want a recv_all in the future...
   len = recv(conn_fd, recv_buf, sizeof(recv_buf)-1, 0);
   recv_buf[len] = '\0';
 
