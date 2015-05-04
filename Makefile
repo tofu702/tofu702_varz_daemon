@@ -11,8 +11,10 @@ BENCH_CFLAGS=$(CFLAGS) -O3
 THIRDPARTY_SOURCES=sds/sds.c
 SOURCES=$(THIRDPARTY_SOURCES) counter_variable.c time_utils.c sample_variable.c hash_table.c json_helpers.c input_parser.c random.c hash_funcs.c executor.c
 TEST_SOURCES=$(SOURCES) counter_variable_test.c sample_variable_test.c executor_test.c hash_table_test.c json_helpers_test.c input_parser_test.c all_tests.c
+FUZZER_SOURCES=$(SOURCES) all_fuzzers.c input_parser_fuzzer.c
 BENCH_SOURCES=$(SOURCES) benchmark.c
 TEST_FLAGS=-D VARZ_STUB
+FUZZER_FLAGS=$(CFLAGS)
 DAEMON_SOURCES=$(SOURCES) daemon.c
 
 VALGRIND_FLAGS=--leak-check=full --show-leak-kinds=all
@@ -30,6 +32,12 @@ build_test: $(TEST_SOURCES)
 
 test: build_test
 	./test
+
+build_fuzzers: $(FUZZER_SOURCES)
+	$(CC) -o fuzzers $(FUZZER_SOURCES) $(FUZZER_FLAGS)
+
+fuzzers: build_fuzzers
+	./fuzzers
 
 valgrind_test: build_test
 	valgrind $(VALGRIND_FLAGS) --suppressions=valgrind_test.suppressions ./test
