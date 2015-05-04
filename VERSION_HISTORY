@@ -1,0 +1,11 @@
+0.3: 
+- Fixed SIGPIPE issue
+- Increased the size of RCVBUF for the UDP socket to be as large as possible
+- Added Fuzzers for the input_parser
+
+0.2: 
+- Added the ALLFLUSH command
+- Required commands to be terminated with a ';'
+- Better Protocol Specification Document
+
+0.1: Initial Release
