@@ -1,4 +1,7 @@
 - Better VARZOpCmdParse
-- Fuzzer
 - Better internal documentation
 - New variable type: String value
+- Experiment with other event handling mechanics (ex: libevent)
+
+DONE:
+- fuzzers
