@@ -20,6 +20,7 @@
 #define TCP_LISTEN_QUEUE_SIZE 10
 
 #define EXECUTOR_HT_SIZE 1024
+#define DESIRED_UDP_RCV_BUF_SIZE (64*1024*1024) //Why not, let's aim for the stars
 
 
 /***** STATIC METHOD PROTOTYPES *****/
@@ -65,6 +66,8 @@ static int setupUDPSocketAndReturnFD() {
   int fd; 
   struct sockaddr_in myaddr;
   int reuse_optval;
+  unsigned int actual_rcv_buf_bytes_size;
+  size_t desired_rcv_buf_size, actual_rcv_buf_bytes;
 
   if ((fd = socket(AF_INET, SOCK_DGRAM, 0)) < 0) {
     fprintf(stderr, "ERROR CANNOT OPEN UDP SOCKET\n");
@@ -75,6 +78,12 @@ static int setupUDPSocketAndReturnFD() {
   if (setsockopt(fd, SOL_SOCKET, SO_REUSEADDR, &reuse_optval, sizeof(reuse_optval)) != 0) {
     fprintf(stderr, "ERROR: Unable to set UDP socket to reuse\n");
   }
+
+  desired_rcv_buf_size = DESIRED_UDP_RCV_BUF_SIZE;
+  actual_rcv_buf_bytes_size = sizeof(actual_rcv_buf_bytes);
+  setsockopt(fd, SOL_SOCKET, SO_RCVBUF, &desired_rcv_buf_size, sizeof(desired_rcv_buf_size));
+  getsockopt(fd, SOL_SOCKET, SO_RCVBUF, &actual_rcv_buf_bytes, &actual_rcv_buf_bytes_size);
+  printf("Setting up UDP socket RCVBUF size = %lu bytes\n", actual_rcv_buf_bytes);
 
   memset(&myaddr, 0, sizeof(struct sockaddr_in));
   myaddr.sin_family = AF_INET;
