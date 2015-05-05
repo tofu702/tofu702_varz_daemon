@@ -67,7 +67,7 @@ static int setupUDPSocketAndReturnFD() {
   struct sockaddr_in myaddr;
   int reuse_optval;
   unsigned int actual_rcv_buf_bytes_size;
-  size_t desired_rcv_buf_size, actual_rcv_buf_bytes;
+  size_t desired_rcv_buf_size, actual_rcv_buf_bytes=0;
 
   if ((fd = socket(AF_INET, SOCK_DGRAM, 0)) < 0) {
     fprintf(stderr, "ERROR CANNOT OPEN UDP SOCKET\n");
@@ -146,30 +146,34 @@ static void handleUDPPacket(int udp_fd, VARZExecutor_t *executor) {
 static void handleNewTCPConnection(int tcp_fd, VARZExecutor_t *executor) {
   struct sockaddr_storage incoming_addr;
   uint8_t recv_buf[RECV_BUFSIZE];
-  int len;
+  int conn_fd, recved_bytes, send_flags=0;
   socklen_t recv_buf_len;
   struct VARZOperationDescription desc;
-  int conn_fd;
-  
+
   recv_buf_len  = sizeof(recv_buf) - 1;
   if ((conn_fd = accept(tcp_fd, (struct sockaddr *) &incoming_addr, &recv_buf_len)) < 0) {
     fprintf(stderr, "Unable to get FD for TCP accept()\n");
     exit(1);
   }
 
-  // SIGPIPES crash the whole program...
-  int disable_sigpipe = 1;
-  setsockopt(conn_fd, SOL_SOCKET, SO_NOSIGPIPE, &disable_sigpipe, sizeof(disable_sigpipe));
+  // SIGPIPES crash the whole program..., we need to handle them differently on linux than on
+  // OS X
+  #ifdef SO_NOSIGPIPE // OS X
+    int disable_sigpipe = 1;
+    setsockopt(conn_fd, SOL_SOCKET, SO_NOSIGPIPE, &disable_sigpipe, sizeof(disable_sigpipe));
+  #else // LINUX
+    send_flags |= MSG_NOSIGNAL;
+  #endif
 
   // TODO: We might want a recv_all in the future...
-  len = recv(conn_fd, recv_buf, sizeof(recv_buf)-1, 0);
-  recv_buf[len] = '\0';
+  recved_bytes = recv(conn_fd, recv_buf, sizeof(recv_buf)-1, 0);
+  recv_buf[recved_bytes] = '\0';
 
-  desc = VARZOpCmdParse((char*)recv_buf, len);
+  desc = VARZOpCmdParse((char*)recv_buf, recved_bytes);
 
   void *result = VARZExecutorExecute(executor, &desc);
   if (result) {
-    sendall(conn_fd, result, strlen((char*)result), 0);
+    sendall(conn_fd, result, strlen((char*)result), send_flags);
     free(result);
   }
   
