@@ -8,6 +8,7 @@
 #include "json_helpers.h"
 #include "hash_funcs.h"
 #include "hash_table.h"
+#include "time_utils.h"
 
 
 #define DEFAULT_START_TIME 0
@@ -19,6 +20,7 @@ enum EntryType {
   ETMHTCounter = 1,
   ETMHTSampler = 2
 };
+
 struct VisitorData {
   sds *dest;
   int counter;
@@ -47,6 +49,7 @@ void VARZExecutorInit(VARZExecutor_t *executor, unsigned long hash_table_size) {
   memset(executor, 0, sizeof(VARZExecutor_t));
   VARZHashTableInit(&(executor->mht_counters_ht), hash_table_size);
   VARZHashTableInit(&(executor->mht_samplers_ht), hash_table_size);
+  executor->metadata.executor_start_time = VARZCurrentTime();
 }
 
 void VARZExecutorFree(VARZExecutor_t *executor) {

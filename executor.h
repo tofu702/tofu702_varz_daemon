@@ -18,7 +18,15 @@
 #define VARZ_EXECUTOR_NUM_HASH_TABLES 2
 
 
+struct VARZExecutorMetadata {
+  // Note that unlike other times in varz, this is a local time (not one supplied by the client)
+  varz_time_t executor_start_time;
+};
+
+
 typedef struct {
+  struct VARZExecutorMetadata metadata;
+
   VARZHashTable_t mht_counters_ht, mht_samplers_ht;
 } VARZExecutor_t;
 
