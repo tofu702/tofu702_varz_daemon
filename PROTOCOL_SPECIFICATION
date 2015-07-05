@@ -28,10 +28,11 @@ ALLFLUSH;
 
 JSON Output Format
 ------------------
-ALL_DUMP_JSON = {"mht_counters": [<COUNTER_JSON_WRAPPER>], "mht_samplers": [<SAMPLER_JSON_WRAPPER>]}
+ALL_DUMP_JSON = {"mht_counters": [<COUNTER_JSON_WRAPPER>], "mht_samplers": [<SAMPLER_JSON_WRAPPER>], "metadata":<DUMP_METADATA>}
 ALL_LIST_JSON = {"mht_counters": [string], "mht_samplers": [string]}
 COUNTER_JSON_WRAPPER = {"name": string, "value": <COUNTER_JSON>}
 COUNTER_JSON = {"min_counters": [int], "all_time_count": int, "latest_time_sec": time_int}
+DUMP_METADATA = {"start_time": time_int}
 SAMPLER_JSON_WRAPPER = {"name": string, "value": <SAMPLER_JSON>}
 SAMPLER_JSON = {"latest_time_sec": time_int, "last_minute_samples": <SAMPLE_SET_JSON>,
                "all_time_samples": <SAMPLE_SET_JSON>}
