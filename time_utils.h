@@ -17,4 +17,15 @@ varz_time_t VARZMakeTime(unsigned long days, unsigned long hours, unsigned long 
                          unsigned long sec);
 double VARZCurrentDoubleTime();
 
+#ifdef VARZ_STUB
+
+/* IF VARZ_STUB is set (usually via gcc) this allows us to set the time returned by VARZCurrentTime
+ * but it will ***NOT*** set the time returned by VARZCurrentDoubleTime (which is used only for
+ * debugging testing and benchmarking.
+ */
+void VARZCurrentTimeStubValue(varz_time_t value);
+
+
+#endif
+
 #endif
