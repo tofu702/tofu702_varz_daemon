@@ -1,4 +1,3 @@
-- Global Created time (IE: time since last flush), needed for all time rates for counters/samplers
 - Sampler Support for last full minute
 - Sampler Support for rolling last hour
 - Better VARZOpCmdParse
@@ -8,3 +7,4 @@
 
 DONE:
 - fuzzers
+- Global Created time (IE: time since last flush), needed for all time rates for counters/samplers
