@@ -5,6 +5,7 @@
 #include "all_tests.h"
 #include "command_description.h"
 #include "executor.h"
+#include "time_utils.h"
 
 
 static int test_executor_ignores_invalid_op() {
@@ -136,6 +137,7 @@ static int test_executor_all_dump_json_trivial() {
   void *result;
   VARZExecutor_t executor;
   struct VARZOperationDescription desc;
+  VARZCurrentTimeStubValue(1);
   VARZExecutorInit(&executor, 2);
 
   memset(&desc, 0, sizeof(desc));
@@ -143,8 +145,10 @@ static int test_executor_all_dump_json_trivial() {
 
   result = VARZExecutorExecute(&executor, &desc);
 
-  expected_result = "{\"mht_counters\":[],\"mht_samplers\":[]}";
+  expected_result = "{\"mht_counters\":[],\"mht_samplers\":[],\"metadata\":{\"start_time\":1}}";
   if(strcmp(expected_result, result)) {
+    printf("Error test_executor_all_list_json_trivial, expected '%s', got '%s'\n", expected_result,
+           result);
     return 1;
   }
   free(result);
@@ -212,6 +216,5 @@ int executor_tests() {
   failure_count += test_executor_all_dump_json_trivial();
   failure_count += test_executor_all_list_json_trivial();
   failure_count += test_executor_all_flush();
-
   return failure_count;
 }

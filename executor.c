@@ -39,6 +39,7 @@ static void JSONKeyListVisitor(struct VARZHashTableEntry *entry, void *data);
 static void JSONReprVisitor(struct VARZHashTableEntry *entry, void *data);
 static void MHTCountersJSONRepr(VARZExecutor_t *executor, sds *dest);
 static void MHTSamplersJSONRepr(VARZExecutor_t *executor, sds *dest);
+static void metadataJSONRepr(VARZExecutor_t *executor, sds *dest);
 static void MHTCounterFreeVisitor(struct VARZHashTableEntry *entry, void *data);
 static void MHTSamplersFreeVisitor(struct VARZHashTableEntry *entry, void *data);
 
@@ -131,6 +132,10 @@ static char *handleALLDumpJSON(VARZExecutor_t *executor, struct VARZOperationDes
   VARZJSONDictNextKey(dest);
   VARZJSONDictKey(dest, "mht_samplers");
   MHTSamplersJSONRepr(executor, dest);
+
+  VARZJSONDictNextKey(dest);
+  VARZJSONDictKey(dest, "metadata");
+  metadataJSONRepr(executor, dest);
 
   VARZJSONDictEnd(dest);
 
@@ -246,6 +251,18 @@ static void MHTSamplersJSONRepr(VARZExecutor_t *executor, sds *dest) {
   VARZHashTableVisit(&(executor->mht_samplers_ht), &JSONReprVisitor, &vd);
   VARZJSONArrayEnd(dest);
 }
+
+
+static void metadataJSONRepr(VARZExecutor_t *executor, sds *dest) {
+  VARZJSONDictStart(dest);
+
+  // We won't call it executor_start_time since that's not part of the abstraction
+  VARZJSONDictKey(dest, "start_time");
+  VARZJSONUnsignedLongRepr(dest, executor->metadata.executor_start_time);
+
+  VARZJSONDictEnd(dest);
+}
+
 
 static void MHTCounterFreeVisitor(struct VARZHashTableEntry *entry, void *data) {
   free(entry->value);
