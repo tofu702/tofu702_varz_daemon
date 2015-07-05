@@ -10,6 +10,8 @@ typedef unsigned long varz_time_t;
 
 unsigned long VARZMinutesSinceEpoch(varz_time_t time);
 
+varz_time_t VARZCurrentTime();
+
 /**** DEBUGGING & TESTING ONLY *****/
 varz_time_t VARZMakeTime(unsigned long days, unsigned long hours, unsigned long min, 
                          unsigned long sec);
