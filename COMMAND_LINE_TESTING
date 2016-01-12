@@ -1,0 +1,5 @@
+echo -n  "MHTCOUNTERADD xx `date +%s`000 5;" | nc localhost 14447
+echo -n  "MHTCOUNTERGET xx;" | nc localhost 14447
+
+The "-n" makes sure you don't send a newline character, which causes the daemon
+to ignore the request.

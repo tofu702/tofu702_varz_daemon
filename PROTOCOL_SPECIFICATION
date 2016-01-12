@@ -5,7 +5,7 @@ command.
 
 Command Format
 ------------------
-COMMAND = (<ADD_COMMAND> | <CONTROL_COMMAND>) ";"
+COMMAND = (<ADD_COMMAND> | <GET_COMMAND> | <CONTROL_COMMAND>) ";"
 ADD_COMMAND = <ADD_OPERATION> <VARIABLE_NAME> <TIME> <VALUE>
 ADD_OPERATIONS = "MHTCOUNTERADD" | "MHTSAMPLEADD"
 VARIABLE_NAME = 
@@ -15,12 +15,14 @@ TIME = [uint64]
 VALUE = [uint64] 
   # For counters, amount to increment the counter by
   # For samples, the value of the sample
+GET_COMMAND = "MHTCOUNTERGET"
 CONTROL_COMMAND = "ALLDUMPJSON" | "ALLLISTJSON" | "ALLFLUSH"
 
 
 Examples:
 MHTCOUNTERADD lookup_request 1420960985123 2;
 MHTSAMPLEADD lookup_request_latency_ms 1420960985123 231;
+MHTCOUNTERGET lookup_request;
 ALLDUMPJSON;
 ALLLISTJSON;
 ALLFLUSH;
@@ -38,3 +40,4 @@ SAMPLER_JSON = {"latest_time_sec": time_int, "last_minute_samples": <SAMPLE_SET_
                "all_time_samples": <SAMPLE_SET_JSON>}
 SAMPLE_SET_JSON = {"sample_values": [int], "sample_times_sec": [int], "samples_size": int,
                 "num_events": int}
+

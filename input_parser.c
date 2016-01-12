@@ -64,6 +64,8 @@ struct VARZOperationDescription VARZOpCmdParse(char *cmd, int cmd_len) {
       break;
     case VARZOP_ALL_FLUSH:
       break;
+    case VARZOP_MHT_COUNTER_GET:
+      break;
     default:
       desc.op = VARZOP_INVALID;
   }
@@ -76,6 +78,8 @@ struct VARZOperationDescription VARZOpCmdParse(char *cmd, int cmd_len) {
 static enum VARZOperationType opNameToType(char *name) {
   if (!strcmp(VARZ_MHT_COUNTER_ADD_OP_NAME, name)) {
     return VARZOP_MHT_COUNTER_ADD;
+  } else if (!strcmp(VARZ_MHT_COUNTER_GET_OP_NAME, name)) {
+    return VARZOP_MHT_COUNTER_GET;
   } else if(!strcmp(VARZ_MHT_SAMPLE_ADD_OP_NAME, name)) {
     return VARZOP_MHT_SAMPLE_ADD;
   } else if(!strcmp(VARZ_ALL_DUMP_JSON_OP_NAME, name)) {
