@@ -30,6 +30,7 @@ struct VisitorData {
 
 /***** STATIC HELPER PROTOTYPES *****/
 static void handleMHTCounterAdd(VARZExecutor_t *executor, struct VARZOperationDescription *op);
+static char *handleMHTCounterGet(VARZExecutor_t *executor, struct VARZOperationDescription *op);
 static void handleMHTSamplerAdd(VARZExecutor_t *executor, struct VARZOperationDescription *op);
 static char *handleALLDumpJSON(VARZExecutor_t *executor, struct VARZOperationDescription *op);
 static char *handleALLListJSON(VARZExecutor_t *executor, struct VARZOperationDescription *op);
@@ -79,6 +80,8 @@ void *VARZExecutorExecute(VARZExecutor_t *executor, struct VARZOperationDescript
     case VARZOP_ALL_FLUSH:
       handleALLFlush(executor, op);
       return NULL;
+    case VARZOP_MHT_COUNTER_GET:
+      return handleMHTCounterGet(executor, op);
   }
 
   // We got an invalid op...
@@ -104,6 +107,20 @@ static void handleMHTCounterAdd(VARZExecutor_t *executor, struct VARZOperationDe
   VARZMHTIntCounterIncrement(counter, counter_add_op->time, counter_add_op->amt);
 }
 
+static char *handleMHTCounterGet(VARZExecutor_t *executor, struct VARZOperationDescription *op) {
+  char *returnme;
+  sds return_sds = sdsempty();
+  sds *dest = &return_sds;
+  VARZMHTIntCounter_t *counter;
+  uint64_t name_hash = VARZHashString(op->variable_name);
+  counter = VARZHashTableGet(&(executor->mht_counters_ht), op->variable_name, name_hash);
+  if(counter) { // found
+    VARZMHTIntCounterJSONRepr(counter, dest);
+  }
+  returnme = strdup(return_sds);
+  sdsfree(return_sds);
+  return returnme;
+}
 
 static void handleMHTSamplerAdd(VARZExecutor_t *executor, struct VARZOperationDescription *op) {
   VARZMHTIntSampler_t *sampler;
