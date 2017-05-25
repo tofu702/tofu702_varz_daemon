@@ -1,6 +1,7 @@
 #include <stdbool.h>
 #include <stdlib.h>
 #include <stdio.h>
+#include <string.h>
 
 #include "all_tests.h"
 #include "hash_table.h"
@@ -105,6 +106,85 @@ static int test_add_and_get_resolve_for_same_hash_different_strings() {
   return 0;
 }
 
+static int test_remove_for_single_item() {
+  char dummy1[3];
+  VARZHashTable_t ht;
+
+  VARZHashTableInit(&ht, 4);
+  VARZHashTableAdd(&ht, "foo", 1, dummy1);
+
+  if (VARZHashTableRemove(&ht, "foo", 1) != dummy1) {
+    printf("ERROR: test_remove_for_single_item didn't get original return value\n");
+    return 1;
+  } else if (ht.total_entries != 0) {
+    printf("ERROR: test_remove_for_single_item doesn't zero entries\n");
+    return 1;
+  } else if (ht.slots[1].num_entries != 0) {
+    printf("ERROR: test_remove_for_single_item slot one should have count 0\n");
+    return 1;
+  }
+
+  return 0;
+}
+
+
+static int test_remove_for_middle_of_three_entries() {
+  char dummy1[3], dummy2[3], dummy3[3];
+  VARZHashTable_t ht;
+
+  VARZHashTableInit(&ht, 4);
+  VARZHashTableAdd(&ht, "foo", 1, dummy1);
+  VARZHashTableAdd(&ht, "bar", 1, dummy2);
+  VARZHashTableAdd(&ht, "baz", 4+1, dummy3);
+
+  if (VARZHashTableRemove(&ht, "bar", 1) != dummy2) {
+    printf("ERROR: test_remove_for_middle_of_three_entries didn't get original return value\n");
+    return 1;
+  } else if (ht.total_entries != 2) {
+    printf("ERROR: test_remove_for_middle_of_three_entries doesn't produce 2 total entries\n");
+    return 1;
+  } else if(ht.slots[1].num_entries != 2) {
+    printf("ERROR: test_remove_for_middle_of_three_entries doesn't have 2 entries in slot\n");
+    return 1;
+  } else if(strcmp(ht.slots[1].entries[1].name, "baz") || ht.slots[1].entries[1].value != dummy3) {
+    printf("ERROR: test_remove_for_middle_of_three_entries didn't slide 3rd entry over\n");
+    return 1;
+  } else if(strcmp(ht.slots[1].entries[0].name, "foo") || ht.slots[1].entries[0].value != dummy1) {
+    printf("ERROR: test_remove_for_middle_of_three_entries destroyed 1st entry \n");
+    return 1;
+  }
+
+  return 0;
+}
+
+static int test_remove_for_first_of_three_entries() {
+  char dummy1[3], dummy2[3], dummy3[3];
+  VARZHashTable_t ht;
+
+  VARZHashTableInit(&ht, 4);
+  VARZHashTableAdd(&ht, "foo", 1, dummy1);
+  VARZHashTableAdd(&ht, "bar", 1, dummy2);
+  VARZHashTableAdd(&ht, "baz", 4+1, dummy3);
+
+  if (VARZHashTableRemove(&ht, "foo", 1) != dummy1) {
+    printf("ERROR: test_remove_for_first_of_three_entries didn't get original return value\n");
+    return 1;
+  } else if (ht.total_entries != 2) {
+    printf("ERROR: test_remove_for_first_of_three_entries doesn't produce 2 total entries\n");
+    return 1;
+  } else if(ht.slots[1].num_entries != 2) {
+    printf("ERROR: test_remove_for_first_of_three_entries doesn't have 2 entries in slot\n");
+    return 1;
+  } else if(strcmp(ht.slots[1].entries[1].name, "baz") || ht.slots[1].entries[1].value != dummy3) {
+    printf("ERROR: test_remove_for_first_of_three_entries didn't slide 3rd entry over\n");
+    return 1;
+  } else if(strcmp(ht.slots[1].entries[0].name, "bar") || ht.slots[1].entries[0].value != dummy2) {
+    printf("ERROR: test_remove_for_first_of_three_entries destroyed 1st entry \n");
+    return 1;
+  }
+
+  return 0;
+}
 
 static void visit_test_visitor(struct VARZHashTableEntry *entry, void *results) {
   void **results_arr = (void**) results;
@@ -155,11 +235,14 @@ static int test_visit() {
 
 int hash_table_tests() {
   int failure_count = 0;
-  
+
   failure_count += test_add_and_get_unique_slots();
   failure_count += test_get_for_non_existant_value_returns_null();
   failure_count += test_add_and_get_resolve_for_multiple_items_in_same_slot();
   failure_count += test_add_and_get_resolve_for_same_hash_different_strings();
+  failure_count += test_remove_for_single_item();
+  failure_count += test_remove_for_middle_of_three_entries();
+  failure_count += test_remove_for_first_of_three_entries();
   failure_count += test_visit();
 
   return failure_count;

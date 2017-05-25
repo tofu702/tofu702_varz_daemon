@@ -42,6 +42,8 @@ void VARZHashTableFree(VARZHashTable_t *ht);
 
 void VARZHashTableAdd(VARZHashTable_t *ht, char name[128], uint64_t name_hash, void *value);
 
+void* VARZHashTableRemove(VARZHashTable_t *ht, char name[128], uint64_t name_hash);
+
 // Return NULL if entry not found
 void *VARZHashTableGet(VARZHashTable_t *ht, char name[128], uint64_t name_hash);
 

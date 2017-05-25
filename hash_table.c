@@ -51,6 +51,38 @@ void VARZHashTableAdd(VARZHashTable_t *ht, char name[128], uint64_t name_hash, v
 }
 
 
+void* VARZHashTableRemove(VARZHashTable_t *ht, char name[128], uint64_t name_hash) {
+  struct VARZHashTableSlot *slot;
+  struct VARZHashTableEntry *entries;
+  unsigned int num_entries;
+  void *value;
+
+  slot = ht->slots + computeSlot(name_hash, ht->num_slots);
+  entries = slot->entries;
+
+  num_entries = slot->num_entries;
+
+  for (int i=0; i < num_entries; i++) {
+    if(entries[i].name_hash == name_hash &&
+       !strncmp(name, entries[i].name, VARZ_HASHTABLE_MAX_NAME_LEN-1)) {
+      int num_entries_to_compact;
+
+      num_entries_to_compact = num_entries - i;
+      value = entries[i].value;
+
+      // We shouldn't need to realloc, but could
+      if (num_entries_to_compact > 0) {
+        memmove(entries+i, entries+i+1, num_entries_to_compact * sizeof(struct VARZHashTableEntry));
+      }
+      ht->total_entries --;
+      slot->num_entries --;
+      return value;
+    }
+  }
+  return NULL;
+}
+
+
 void *VARZHashTableGet(VARZHashTable_t *ht, char name[128], uint64_t name_hash) {
   struct VARZHashTableSlot *slot;
   struct VARZHashTableEntry *entries;
@@ -64,7 +96,7 @@ void *VARZHashTableGet(VARZHashTable_t *ht, char name[128], uint64_t name_hash) 
 
   // TODO: Performance Optimization: Sort the slots
   for (int i=0; i < num_entries; i++) {
-    if(entries[i].name_hash == name_hash && 
+    if(entries[i].name_hash == name_hash &&
        !strncmp(name, entries[i].name, VARZ_HASHTABLE_MAX_NAME_LEN-1)) {
       return entries[i].value;
     }
